@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: pathways-db
+    environment:
+      POSTGRES_USER: pathways
+      POSTGRES_PASSWORD: pathways
+      POSTGRES_DB: pathways
+    ports:
+      # Host port 5433 (avoid clashing with any system-wide Postgres on 5432).
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pathways -d pathways"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
