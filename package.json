@@ -15,7 +15,8 @@
     "ingest:cec:hia": "uv run --project ingest python ingest/cec_hia.py",
     "ingest:cec:designations": "uv run --project ingest python ingest/cec_designations.py",
     "ingest:cec:completions": "uv run --project ingest python ingest/cec_completions.py",
-    "ingest:cec:crosswalk": "uv run --project ingest python ingest/cec_crosswalk.py"
+    "ingest:cec:crosswalk": "uv run --project ingest python ingest/cec_crosswalk.py",
+    "ingest:geocode": "uv run --project ingest python ingest/geocode.py"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.3",

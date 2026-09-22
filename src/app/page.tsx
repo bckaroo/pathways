@@ -1,43 +1,86 @@
-import { count } from "drizzle-orm";
+import { count, eq, gt, isNotNull } from "drizzle-orm";
+import Link from "next/link";
+
 import { db } from "@/db";
-import { actions, certifications, completions, municipalities } from "@/db/schema";
+import {
+  actions,
+  cecCompletions,
+  cecDesignations,
+  certifications,
+  completions,
+  municipalities,
+} from "@/db/schema";
 
 type Stats = {
-  municipalities: number;
+  cscCommunities: number;
   certified: number;
+  cecTracked: number;
+  cecDesignated: number;
+  cecStars: number;
   actions: number;
   completions: number;
+  cecCompletions: number;
   dbReady: boolean;
 };
 
 async function loadStats(): Promise<Stats> {
   try {
-    const [[m], [c], [a], [k]] = await Promise.all([
-      db.select({ n: count() }).from(municipalities),
+    const [[m], [c], [a], [k], [t], [d], [s], [ck]] = await Promise.all([
+      db.select({ n: count() }).from(municipalities).where(gt(municipalities.portalUid, 0)),
       db.select({ n: count() }).from(certifications),
       db.select({ n: count() }).from(actions),
       db.select({ n: count() }).from(completions),
+      db.select({ n: count() }).from(cecDesignations),
+      db
+        .select({ n: count() })
+        .from(cecDesignations)
+        .where(eq(cecDesignations.status, "Designated CEC")),
+      db
+        .select({ n: count() })
+        .from(cecDesignations)
+        .where(isNotNull(cecDesignations.advancedDesignation)),
+      db.select({ n: count() }).from(cecCompletions),
     ]);
     return {
-      municipalities: Number(m.n),
+      cscCommunities: Number(m.n),
       certified: Number(c.n),
       actions: Number(a.n),
       completions: Number(k.n),
+      cecTracked: Number(t.n),
+      cecDesignated: Number(d.n),
+      cecStars: Number(s.n),
+      cecCompletions: Number(ck.n),
       dbReady: true,
     };
   } catch {
-    return { municipalities: 0, certified: 0, actions: 0, completions: 0, dbReady: false };
+    return {
+      cscCommunities: 0,
+      certified: 0,
+      actions: 0,
+      completions: 0,
+      cecTracked: 0,
+      cecDesignated: 0,
+      cecStars: 0,
+      cecCompletions: 0,
+      dbReady: false,
+    };
   }
 }
 
 export default async function Home() {
   const stats = await loadStats();
 
-  const cards = [
-    { label: "Registered communities", value: stats.municipalities, hint: "CSC registrations statewide" },
+  const cscCards = [
+    { label: "CSC communities", value: stats.cscCommunities, hint: "Registered in the CSC program" },
     { label: "Currently certified", value: stats.certified, hint: "Bronze, Silver or Gold" },
     { label: "Actions in library", value: stats.actions, hint: "2025 CSC certification checklist" },
     { label: "Actions completed", value: stats.completions, hint: "Parsed from certification reports" },
+  ];
+  const cecCards = [
+    { label: "CEC communities tracked", value: stats.cecTracked, hint: "NYSERDA CEC program (closed)" },
+    { label: "CEC designated", value: stats.cecDesignated, hint: "Designated Clean Energy Communities" },
+    { label: "Advanced stars (1\u20135★)", value: stats.cecStars, hint: "Advanced (v3.0) star ratings" },
+    { label: "CEC actions completed", value: stats.cecCompletions, hint: "High-impact actions, frozen snapshot" },
   ];
 
   return (
@@ -82,8 +125,23 @@ export default async function Home() {
         </div>
       )}
 
+      <div className="mb-6 flex flex-wrap gap-3">
+        <Link
+          href="/map"
+          className="rounded-lg bg-emerald-600 px-5 py-2.5 font-medium text-white shadow-sm transition hover:bg-emerald-700"
+        >
+          Explore the statewide map →
+        </Link>
+        <Link
+          href="/communities"
+          className="rounded-lg border border-neutral-300 bg-white px-5 py-2.5 font-medium text-neutral-700 shadow-sm transition hover:border-neutral-400"
+        >
+          Browse communities →
+        </Link>
+      </div>
+
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {cards.map((c) => (
+        {cscCards.map((c) => (
           <div
             key={c.label}
             className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm"
@@ -95,6 +153,26 @@ export default async function Home() {
             <div className="text-sm text-neutral-500">{c.hint}</div>
           </div>
         ))}
+      </section>
+
+      <section className="mt-10">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-500">
+          Clean Energy Communities (historical · program closed)
+        </h2>
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {cecCards.map((c) => (
+            <div
+              key={c.label}
+              className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm"
+            >
+              <div className="text-3xl font-bold tabular-nums">
+                {c.value.toLocaleString("en-US")}
+              </div>
+              <div className="mt-1 font-medium">{c.label}</div>
+              <div className="text-sm text-neutral-500">{c.hint}</div>
+            </div>
+          ))}
+        </section>
       </section>
 
       <footer className="mt-12 border-t border-neutral-200 pt-6 text-sm text-neutral-500">

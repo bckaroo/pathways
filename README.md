@@ -4,8 +4,8 @@ Open-source, self-hostable dashboard tracking **NYSDEC Climate Smart Communities
 certification and **NYSERDA Clean Energy Communities (CEC)** actions across New York
 State municipalities. A free alternative to commercial climate-action platforms.
 
-**Status:** v0 bootstrap — data foundation (CSC ingestion live; CEC ingestion and the
-public dashboard are next milestones).
+**Status:** v1 public dashboard — statewide MapLibre map (CSC certification / CEC
+stars) + community profile pages on top of the ingested CSC + CEC data.
 
 ## Stack
 
@@ -30,8 +30,38 @@ npm run db:migrate            # applies checked-in drizzle migrations
 npm run ingest:csc:actions    # official 2025-12-18 CSC action checklist XLSX
 npm run ingest:csc:communities  # participating communities + certifications + reports (~3 min)
 
-# 5. Dev server (port 3005, inside the 3000-3099 dev range)
+# 5. Ingest CEC data (program closed — frozen snapshot)
+npm run ingest:cec:hia          # HIA categories + max points into the action library
+npm run ingest:cec:designations # 942 designations + Advanced stars
+npm run ingest:cec:completions  # 5,336 completed HIAs (action grain)
+npm run ingest:cec:crosswalk    # CSC ↔ CEC equivalence from the DEC crosswalk PDF
+npm run ingest:geocode          # census-gazetteer coordinates for CEC-only municipalities
+
+# 6. Dev server (port 3005, inside the 3000-3099 dev range)
 npm run dev                   # http://localhost:3005
+```
+
+## Dashboard (v1)
+
+- **Statewide map** (`/map`): one point per municipality over a free
+  CARTO/OpenStreetMap raster basemap; color modes toggle between CSC
+  certification level (Registered/Bronze/Silver/Gold) and CEC designation +
+  Advanced (v3.0) stars. Click a point for a summary popup linking to the
+  community profile.
+- **Communities index** (`/communities`): searchable/filterable table of all
+  tracked municipalities.
+- **Community profiles** (`/communities/[uid]`): CSC certification badge,
+  points and report link; completed CSC actions (unmatched legacy names are
+  preserved verbatim); CEC designation card (stars, HIAs, points, population)
+  and completed CEC actions.
+- Pages are server-rendered on demand (`force-dynamic`) so the UI always
+  reflects the database; the build stays clean even without Postgres running
+  (pages degrade to a "database not reachable" notice).
+- Coordinates: CSC portal communities carry portal coordinates; the 546
+  CEC-only municipalities are geocoded from `cec_designations.geo_id` against
+  the U.S. Census 2020 Gazetteer (NY FIPS 36; towns join on state+MCD code,
+  villages/cities on place GEOID, counties on county GEOID) with a
+  name-matching fallback (`ingest/geocode.py`, idempotent).
 ```
 
 ### Ports
@@ -47,6 +77,7 @@ Dev servers run in **3000–3099** only; this repo pins **3005** (`npm run dev` 
 | NYSERDA Clean Energy Communities map/scorecard (bi.nyserda.ny.gov Tableau, program closed — frozen) | Per-municipality CEC designations + Advanced (v3.0) star status (942 communities), completed High-Impact Actions (action-grain), star point thresholds | `ingest/cec_designations.py`, `ingest/cec_completions.py` (Tableau wire client: `ingest/cec_tableau.py`) |
 | NYSERDA CEC High-Impact Actions page | HIA categories + maximum points ("Up to N points") | `ingest/cec_hia.py` |
 | NYSDEC official CEC/CSC crosswalk PDF (2024-12-20) | CSC ↔ CEC action equivalence mapping | `ingest/cec_crosswalk.py` |
+| U.S. Census 2020 Gazetteer (NY FIPS 36) | Population-weighted centroids for CEC-only municipalities (map geocoding via `cec_designations.geo_id`) | `ingest/geocode.py` |
 
 - CSC action checklist XLSX: https://climatesmart.ny.gov/fileadmin/csc/documents/Action_Checklist/2025-12-18-CSC-CertActionChecklist.xlsx
 - Participating communities: https://climatesmart.ny.gov/actions-certification/participating-communities

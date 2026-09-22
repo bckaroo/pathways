@@ -137,3 +137,60 @@ project **PROJ-025**). New entries go at the top.
   `certification_levels.points_required`.
 - Optional: chase the 2 outlier certification reports (134, 98) for further
   legacy name formats; add GitHub remote + push when owner requests it.
+## Round 3 — 2026-09-21 · xiaozhu · v1 public dashboard (DEV-151)
+
+**What was built**
+
+- Geocoding (`ingest/geocode.py`, `npm run ingest:geocode`): the 546 CEC-only
+  municipalities (synthetic negative uids) had no coordinates. The CEC map
+  publishes `cec_designations.geo_id`; verified it joins the US Census 2020
+  Gazetteer (NY FIPS 36) 100%: villages/cities on the 7-digit place GEOID
+  (179), towns on the state+MCD key (348), counties on the county GEOID (19).
+  A name-matching fallback (parenthetical-stripped, punctuation/space-folded
+  keys) stays as a safety net. Coordinates coverage now 1,024/1,024.
+- Statewide map `/map`: MapLibre GL 6 (named imports — v6 dropped the default
+  export) over a free CARTO light raster basemap (OSM attribution). One
+  circle per municipality; color mode toggles between CSC certification
+  level (Registered/Bronze/Silver/Gold) and CEC designation + Advanced stars
+  (5-step green ramp + lime for plain Designated). Hover cursor, click
+  popups link to profile pages; legend + stat chips per mode.
+- Communities index `/communities`: full 1,024-row table with client-side
+  search, municipality-type filter, CEC status/star filter, certified-only
+  toggle.
+- Community profiles `/communities/[uid]`: CSC card (level badge, points,
+  certified date, report link, completion count), completed CSC actions table
+  (unmatched legacy names preserved verbatim + footnote), CEC card (status,
+  stars, HIAs approved, points, population, size, region, last HIA),
+  completed CEC actions table.
+- Home page: CEC stats row + "Explore the statewide map" / "Browse
+  communities" CTAs; shared nav header in the root layout.
+
+**Verification**
+
+- `npm run lint`: clean. `npm run build`: 5/5 routes, clean (dynamic routes
+  `/map`, `/communities`, `/communities/[uid]` are force-dynamic; build stays
+  green without Postgres).
+- Production server smoke test (next start, port 3005): `/`, `/map`,
+  `/communities` → 200; `/communities/1191` (Potsdam, Bronze cert + action
+  tables), `/communities/-811010` (NYC, CEC-only synthetic, Designated 4★),
+  `/communities/403` (Croton-on-Hudson, 5★) → 200 with expected content;
+  communities index shows "Showing 1,024 of 1,024".
+- Geocode re-run is idempotent (546/546 re-joined, no unmatched).
+
+**Decisions**
+
+- Point map (not boundary polygons) for v1 — no boundary dataset required;
+  census centroids are fine at statewide zoom. Polygons stay a follow-up.
+- DB-backed pages are `force-dynamic` with graceful "database not reachable"
+  fallbacks (fresh data per request; static build stays clean).
+- Geocoding keys off the published CEC geo_id rather than name matching;
+  the 13 towns the name-only pass missed (parenthetical county qualifiers,
+  "AuSable" spellings) all recover via the geo_id join.
+
+**Follow-ups**
+
+- Gold rendering path exists but no Gold communities in data yet (expected).
+- Verify Bronze/Silver point thresholds from CSC docs to populate
+  `certification_levels.points_required` (carried from Round 2).
+- Optional: municipal boundary polygons (choropleth), outlier cert reports
+  (134, 98), GitHub remote + push when owner requests.
