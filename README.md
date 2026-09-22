@@ -44,13 +44,26 @@ Dev servers run in **3000–3099** only; this repo pins **3005** (`npm run dev` 
 | Source | What we ingest | Where |
 |---|---|---|
 | NYSDEC Climate Smart Communities portal (climatesmart.ny.gov) | Action checklist (2025-12-18, version 4.5), participating communities, certification levels, certification reports | `ingest/csc_checklist.py`, `ingest/csc_communities.py` |
-| NYSERDA Clean Energy Communities (nyserda.ny.gov/cec) | High-impact actions, designations *(pending task)* | — |
+| NYSERDA Clean Energy Communities map/scorecard (bi.nyserda.ny.gov Tableau, program closed — frozen) | Per-municipality CEC designations + Advanced (v3.0) star status (942 communities), completed High-Impact Actions (action-grain), star point thresholds | `ingest/cec_designations.py`, `ingest/cec_completions.py` (Tableau wire client: `ingest/cec_tableau.py`) |
+| NYSERDA CEC High-Impact Actions page | HIA categories + maximum points ("Up to N points") | `ingest/cec_hia.py` |
+| NYSDEC official CEC/CSC crosswalk PDF (2024-12-20) | CSC ↔ CEC action equivalence mapping | `ingest/cec_crosswalk.py` |
 
 - CSC action checklist XLSX: https://climatesmart.ny.gov/fileadmin/csc/documents/Action_Checklist/2025-12-18-CSC-CertActionChecklist.xlsx
 - Participating communities: https://climatesmart.ny.gov/actions-certification/participating-communities
 - The CSC action list updates **annually** (latest round: 2025-12-18). Re-run
   `ingest:csc:actions --refresh` after DEC publishes a new checklist.
-- The CEC program is **closed** — its data is historical/frozen.
+- The CEC program is **closed** — its data is historical/frozen. The NYSERDA
+  Tableau dashboards (CEC Map / CEC Scorecard) are read anonymously via their
+  JS-API session endpoints (`ingest/cec_tableau.py`); no account or writes.
+  Individual CEC HIA names/points are derived from the completions dataset
+  (the map page publishes only category maxima); CEC-only municipalities use
+  synthetic negative portal uids (`-(numeric CEC id)`), never colliding with
+  CSC portal uids.
+- Known source discrepancy: the CEC Map KPI reports 6 completed HIAs for the
+  Town of AuSable (CEC701172), but the Scorecard's action-grain table holds
+  no rows for that community — completions therefore cover 5,336 of the
+  5,342 map-KPI actions (verified 2026-09-21; program frozen, gap not
+  recoverable from public sources).
 
 Pathways is an independent open-source project. It is **not affiliated with, endorsed
 by, or sponsored by** NYSDEC or NYSERDA. Program names are used descriptively with

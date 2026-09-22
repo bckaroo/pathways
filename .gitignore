@@ -46,3 +46,5 @@ next-env.d.ts
 data/
 ingest/data/
 ingest/.venv/
+__pycache__/
+*.pyc

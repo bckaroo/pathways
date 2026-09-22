@@ -11,7 +11,11 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "ingest:csc:actions": "uv run --project ingest python ingest/csc_checklist.py",
-    "ingest:csc:communities": "uv run --project ingest python ingest/csc_communities.py"
+    "ingest:csc:communities": "uv run --project ingest python ingest/csc_communities.py",
+    "ingest:cec:hia": "uv run --project ingest python ingest/cec_hia.py",
+    "ingest:cec:designations": "uv run --project ingest python ingest/cec_designations.py",
+    "ingest:cec:completions": "uv run --project ingest python ingest/cec_completions.py",
+    "ingest:cec:crosswalk": "uv run --project ingest python ingest/cec_crosswalk.py"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.3",

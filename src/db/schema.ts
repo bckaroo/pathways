@@ -137,6 +137,77 @@ export const crosswalk = pgTable("crosswalk", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+/**
+ * CEC designation + Advanced (v3.0) star status per municipality, from the
+ * NYSERDA CEC map/scorecard underlying tables (vCEC_PROJECTS +
+ * vCEC_PROJECT_POINT_TOTALS). The CEC program is closed (NYSERDA) — this data
+ * is historical/frozen. One row per CEC-tracked municipality (942 as of the
+ * 2026-09-21 snapshot: 605 designated + 337 not designated).
+ */
+export const cecDesignations = pgTable("cec_designations", {
+  municipalityUid: integer("municipality_uid")
+    .primaryKey()
+    .references(() => municipalities.portalUid),
+  cecCommunityId: text("cec_community_id"), // NYSERDA CEC id, e.g. "CEC300436"
+  status: text("status").notNull(), // 'Designated CEC' | 'Not Designated'
+  designationStatus: text("designation_status"), // 'Designated CEC' | 'Advanced (v3.0) Communities'
+  advancedDesignation: text("advanced_designation"), // '1-Star'..'5-Star' | null
+  starRating: text("star_rating"), // display form, e.g. "(★★)"
+  communitySize: text("community_size"), // 'Small community' | 'Medium community' | 'Large community'
+  region: text("region"), // REDC region, e.g. 'Mid-Hudson'
+  geoId: text("geo_id"), // census GeoID from the CEC map points layer
+  population: integer("population"),
+  hiasApproved: integer("hias_approved"), // 'Advanced (v3.0) HIAs Approved' count
+  pointsAchievedNew: integer("points_achieved_new"),
+  pointsAchievedOld: integer("points_achieved_old"),
+  pointsAchievedTotal: integer("points_achieved_total"),
+  currentStarStatus: text("current_star_status"),
+  lastThreshold: integer("last_threshold"),
+  nextThreshold: integer("next_threshold"),
+  tillNextStar: integer("till_next_star"),
+  latestActionApprovedOn: date("latest_action_approved_on"),
+  sourceUrl: text("source_url"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/**
+ * Completed CEC High-Impact Actions per community, action-grain (from the
+ * NYSERDA CEC scorecard underlying vCEC_PROJECTS table, one row per completed
+ * action; program closed — frozen). rawActionName is kept verbatim; the
+ * (municipality, raw name, completed_on) triple is the idempotency key.
+ * completedOn falls back to the approval date, then a 1900-01-01 sentinel when
+ * the source publishes neither (flagged as a WARN by the ingest script).
+ */
+export const cecCompletions = pgTable(
+  "cec_completions",
+  {
+    id: serial("id").primaryKey(),
+    municipalityUid: integer("municipality_uid")
+      .notNull()
+      .references(() => municipalities.portalUid),
+    actionExternalId: text("action_external_id"), // slug into actions (program cec); null when unmatched
+    rawActionName: text("raw_action_name").notNull(),
+    parentCategory: text("parent_category").notNull(),
+    pointsApproved: integer("points_approved"),
+    pointsCurrentlyValued: integer("points_currently_valued"),
+    pointsAchieved: integer("points_achieved"),
+    pointsEligible: integer("points_eligible"),
+    actionStage: text("action_stage"), // e.g. 'NYSERDA Approved'
+    actionStatus: text("action_status"), // e.g. 'Approval'
+    completedOn: date("completed_on").notNull(),
+    approvedOn: date("approved_on"),
+    sourceUrl: text("source_url"),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    unique("cec_completions_municipality_action_date_key").on(
+      t.municipalityUid,
+      t.rawActionName,
+      t.completedOn,
+    ),
+  ],
+);
+
 /** Certification level thresholds (Bronze/Silver/Gold). Point thresholds to be
  * verified from CSC docs in a later task; the uid→level mapping is from the
  * portal's rankToLevel config (2=bronze, 4=silver). */
