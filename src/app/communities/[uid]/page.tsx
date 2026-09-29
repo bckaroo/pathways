@@ -11,6 +11,7 @@ import {
   completions,
   municipalities,
 } from "@/db/schema";
+import ProgressionPanel from "@/components/progression-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -88,6 +89,12 @@ export default async function CommunityProfilePage({
         certifiedOn: certifications.certifiedOn,
         certName: certifications.name,
         actionName: actions.name,
+        // Needed by the progression panel to group branches and to apply the
+        // gating rules (mandatory + priority are level prerequisites, not just
+        // point sources).
+        pledgeElement: actions.pledgeElement,
+        priority: actions.priority,
+        mandatory: actions.mandatory,
       })
       .from(completions)
       .innerJoin(certifications, eq(completions.certificationUid, certifications.certUid))
@@ -126,6 +133,26 @@ export default async function CommunityProfilePage({
     cert?.levelName ?? base.certificationLevelName ?? null,
   );
   const cscPoints = cert?.pointsApproved ?? null;
+
+  // Shape completions for the progression panel. Kept explicit rather than
+  // passed straight through so the panel's contract stays narrow and the
+  // unmatched-action count is visible to the caller.
+  const progressionActions = cscRows.map((r) => ({
+    group: r.pledgeElement ?? null,
+    name: r.actionName ?? null,
+    rawName: r.raw ?? "",
+    points: r.points ?? null,
+    priority: Boolean(r.priority),
+    mandatory: Boolean(r.mandatory),
+  }));
+  const progressionCert = cert
+    ? {
+        level: cert.level ?? null,
+        levelName: cert.levelName ?? null,
+        pointsApproved: cert.pointsApproved ?? null,
+        certifiedOn: cert.certifiedOn ?? null,
+      }
+    : null;
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
@@ -269,6 +296,13 @@ export default async function CommunityProfilePage({
           )}
         </div>
       </section>
+
+      {/* Certification path — the skill tree. Rendered before the raw action
+          list because it answers "where am I and what unlocks next", which is
+          the question the raw list cannot. */}
+      <div className="mb-10">
+        <ProgressionPanel actions={progressionActions} cert={progressionCert} />
+      </div>
 
       {/* CSC completed actions */}
       <section className="mb-10">

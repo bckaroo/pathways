@@ -21,7 +21,8 @@
     "ingest:cec:completions": "uv run --project ingest python ingest/cec_completions.py",
     "ingest:cec:crosswalk": "uv run --project ingest python ingest/cec_crosswalk.py",
     "ingest:geocode": "uv run --project ingest python ingest/geocode.py",
-    "test:fallback": "python3 scripts/test_basemap_fallback.py"
+    "test:fallback": "python3 scripts/test_basemap_fallback.py",
+    "validate:csc": "tsx scripts/validate-csc-rules.mjs"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.3",
