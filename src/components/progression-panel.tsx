@@ -45,10 +45,10 @@ export type ProgressionCert = {
 };
 
 const LEVEL_COLORS: Record<string, { ring: string; bg: string; fg: string; dot: string }> = {
-  bronze: { ring: "border-amber-400", bg: "bg-amber-50", fg: "text-amber-900", dot: "bg-amber-500" },
-  silver: { ring: "border-slate-400", bg: "bg-slate-50", fg: "text-slate-800", dot: "bg-slate-400" },
-  gold: { ring: "border-yellow-400", bg: "bg-yellow-50", fg: "text-yellow-900", dot: "bg-yellow-500" },
-  registered: { ring: "border-sky-300", bg: "bg-sky-50", fg: "text-sky-900", dot: "bg-sky-400" },
+  bronze: { ring: "border-warn-line", bg: "bg-warn-soft", fg: "text-warn-ink", dot: "bg-warn-solid" },
+  silver: { ring: "border-slate-400", bg: "bg-panel-muted", fg: "text-ink", dot: "bg-slate-400" },
+  gold: { ring: "border-warn-line", bg: "bg-warn-soft", fg: "text-warn-ink", dot: "bg-warn-solid" },
+  registered: { ring: "border-info-line", bg: "bg-info-soft", fg: "text-info-ink", dot: "bg-info-solid" },
 };
 
 function pct(n: number): string {
@@ -78,7 +78,7 @@ function ProgressRing({
   return (
     <div className="flex flex-col items-center">
       <svg width={size} height={size} className="-rotate-90" role="img" aria-label={`${label}: ${pct(clamped)}`}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="currentColor" strokeWidth={stroke} className="text-slate-200" />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="currentColor" strokeWidth={stroke} className="text-line" />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -88,7 +88,7 @@ function ProgressRing({
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={`${dash} ${c - dash}`}
-          className={reached ? "text-emerald-500" : "text-sky-500"}
+          className={reached ? "text-ok-solid" : "text-info-solid"}
         />
       </svg>
       <div className="-mt-[62px] text-center">
@@ -96,7 +96,7 @@ function ProgressRing({
       </div>
       <div className="mt-[30px] text-center">
         <div className="text-xs font-medium">{label}</div>
-        <div className="text-[11px] text-slate-500">{sub}</div>
+        <div className="text-[11px] text-ink-muted">{sub}</div>
       </div>
     </div>
   );
@@ -116,14 +116,14 @@ function ThresholdBar({
   const t = Math.max(0, Math.min(1, need / max));
   const met = value >= need;
   return (
-    <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
+    <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-line">
       <div
-        className={`h-full rounded-full ${met ? "bg-emerald-500" : "bg-sky-500"}`}
+        className={`h-full rounded-full ${met ? "bg-ok-solid" : "bg-info-solid"}`}
         style={{ width: `${v * 100}%` }}
       />
       {/* threshold tick — the "you need to reach this" line */}
       <div
-        className="absolute top-0 h-full w-0.5 bg-slate-800/70"
+        className="absolute top-0 h-full w-0.5 bg-ink/70"
         style={{ left: `calc(${t * 100}% - 1px)` }}
         aria-hidden
       />
@@ -206,10 +206,10 @@ export default function ProgressionPanel({
     [...statuses].reverse().find((s) => s.reached && s.offered)?.level.key ?? "registered";
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-6">
+    <section className="rounded-xl border border-line bg-panel p-6">
       <header className="mb-5">
         <h2 className="text-lg font-semibold">Certification path</h2>
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="mt-1 text-sm text-ink-muted">
           CSC certification is a tech tree, not a scoreboard: every level needs{" "}
           <strong>points</strong>, <strong>breadth</strong> (distinct pledge
           elements), and <strong>prerequisites</strong> (mandatory and priority
@@ -226,7 +226,7 @@ export default function ProgressionPanel({
             <li
               key={s.level.key}
               className={`rounded-lg border-2 p-4 ${
-                isCurrent ? `${colors.ring} ${colors.bg}` : "border-slate-200 bg-white"
+                isCurrent ? `${colors.ring} ${colors.bg}` : "border-line bg-panel"
               } ${!s.offered ? "opacity-70" : ""}`}
             >
               <div className="flex items-center justify-between">
@@ -238,7 +238,7 @@ export default function ProgressionPanel({
               </div>
 
               {!s.offered ? (
-                <p className="mt-2 text-[11px] leading-snug text-slate-500">
+                <p className="mt-2 text-[11px] leading-snug text-ink-muted">
                   {s.level.note ?? "Not currently offered."}
                 </p>
               ) : (
@@ -261,14 +261,14 @@ export default function ProgressionPanel({
                   <ul className="mt-2 space-y-1">
                     {s.gaps.map((g) => (
                       <li key={g.label} className="flex items-center justify-between text-[11px]">
-                        <span className={g.met ? "text-slate-500" : "text-slate-800"}>
+                        <span className={g.met ? "text-ink-muted" : "text-ink"}>
                           {g.met ? "✓" : "•"} {g.label}
                         </span>
                         <span
-                          className={`tabular-nums ${g.met ? "text-emerald-600" : "text-slate-600"}`}
+                          className={`tabular-nums ${g.met ? "text-ok-solid" : "text-ink-muted"}`}
                         >
                           {g.have}
-                          <span className="text-slate-400">/{g.need}</span>
+                          <span className="text-ink-subtle">/{g.need}</span>
                         </span>
                       </li>
                     ))}
@@ -282,13 +282,13 @@ export default function ProgressionPanel({
 
       {/* ---------------- what next ---------------- */}
       {next && nearest && (
-        <div className="mb-6 rounded-lg border border-sky-300 bg-sky-50 p-4">
+        <div className="mb-6 rounded-lg border border-info-line bg-info-soft p-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h3 className="text-sm font-semibold text-sky-900">
+              <h3 className="text-sm font-semibold text-info-ink">
                 Next unlock: {next.status.level.name}
               </h3>
-              <p className="mt-1 text-sm text-sky-900">
+              <p className="mt-1 text-sm text-info-ink">
                 Closest unmet requirement is{" "}
                 <strong>{nearest.gap.label}</strong> — currently{" "}
                 <strong className="tabular-nums">
@@ -297,7 +297,7 @@ export default function ProgressionPanel({
                 ({pct(nearest.progress)} of the way there).
               </p>
             </div>
-            <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-semibold text-sky-800 tabular-nums">
+            <span className="shrink-0 rounded-full bg-panel px-3 py-1 text-xs font-semibold text-info-ink tabular-nums">
               {pct(overallProgress(next.status))} ready
             </span>
           </div>
@@ -305,10 +305,10 @@ export default function ProgressionPanel({
             {next.status.gaps
               .filter((g) => !g.met && g.need > 0)
               .map((g) => (
-                <li key={g.label} className="rounded-md bg-white/70 px-3 py-2">
+                <li key={g.label} className="rounded-md bg-panel/70 px-3 py-2">
                   <div className="mb-1 flex items-baseline justify-between text-xs">
-                    <span className="font-medium text-slate-700">{g.label}</span>
-                    <span className="tabular-nums text-slate-600">
+                    <span className="font-medium text-ink-muted">{g.label}</span>
+                    <span className="tabular-nums text-ink-muted">
                       {g.have}/{g.need}
                     </span>
                   </div>
@@ -319,34 +319,34 @@ export default function ProgressionPanel({
         </div>
       )}
       {!next && (
-        <div className="mb-6 rounded-lg border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-900">
+        <div className="mb-6 rounded-lg border border-ok-line bg-ok-soft p-4 text-sm text-ok-ink">
           <strong>All currently-offered levels reached.</strong> Gold is not yet
           offered by NYSDEC, so there is no further tier to progress toward.
         </div>
       )}
 
       {/* ---------------- points provenance ---------------- */}
-      <div className="mb-6 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
+      <div className="mb-6 rounded-lg border border-line bg-panel-muted px-4 py-3 text-xs text-ink-muted">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <span>
-            <strong className="text-slate-800 tabular-nums">{derived.points}</strong>{" "}
+            <strong className="text-ink tabular-nums">{derived.points}</strong>{" "}
             points {usingApproved ? "(approved by NYSDEC)" : "(estimated from completed actions)"}
           </span>
           {usingApproved && computedPoints !== derived.points && (
-            <span className="text-slate-500">
+            <span className="text-ink-muted">
               our per-action sum is {computedPoints} — approved figure takes precedence
             </span>
           )}
         </div>
         {!usingApproved && (
-          <p className="mt-1 text-slate-500">
+          <p className="mt-1 text-ink-muted">
             Not yet certified, so no approved total exists. The figure above is
             the sum of documented actions and may differ from a future NYSDEC
             determination.
           </p>
         )}
         {unmatched > 0 && (
-          <p className="mt-1 text-amber-700">
+          <p className="mt-1 text-warn-ink">
             {unmatched} completed action{unmatched === 1 ? "" : "s"} could not be
             matched to a catalogue entry and {unmatched === 1 ? "is" : "are"} not
             counted above.
@@ -357,7 +357,7 @@ export default function ProgressionPanel({
       {/* ---------------- the tree ---------------- */}
       <div>
         <h3 className="mb-1 text-sm font-semibold">Branches explored</h3>
-        <p className="mb-3 text-xs text-slate-500">
+        <p className="mb-3 text-xs text-ink-muted">
           {snapshot.pledgeElementsCovered} of 10 pledge elements covered ·{" "}
           {groups.length} branches total. Click a branch to list its actions.
         </p>
@@ -366,37 +366,37 @@ export default function ProgressionPanel({
             const open = openGroup === g.group;
             const pledge = g.isPledgeElement;
             return (
-              <li key={g.group} className="rounded-lg border border-slate-200">
+              <li key={g.group} className="rounded-lg border border-line">
                 <button
                   type="button"
                   onClick={() => setOpenGroup(open ? null : g.group)}
                   aria-expanded={open}
-                  className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-slate-50"
+                  className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-panel-muted"
                 >
                   <span
                     className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold tabular-nums ${
-                      pledge ? "bg-sky-100 text-sky-800" : "bg-slate-100 text-slate-600"
+                      pledge ? "bg-info-soft-strong text-info-ink" : "bg-panel-muted text-info-ink"
                     }`}
                   >
                     {g.group}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-xs font-medium text-slate-800">
+                    <span className="block truncate text-xs font-medium text-ink">
                       {g.label}
                     </span>
-                    <span className="block text-[11px] text-slate-500">
+                    <span className="block text-[11px] text-ink-muted">
                       {g.completedCount} action{g.completedCount === 1 ? "" : "s"}
                       {g.mandatoryDone > 0 && ` · ${g.mandatoryDone} mandatory`}
                       {g.priorityDone > 0 && ` · ${g.priorityDone} priority`}
                     </span>
                   </span>
-                  <span className="shrink-0 text-xs font-semibold tabular-nums text-slate-700">
+                  <span className="shrink-0 text-xs font-semibold tabular-nums text-ink-muted">
                     {g.earned}
-                    <span className="font-normal text-slate-400"> pts</span>
+                    <span className="font-normal text-ink-subtle"> pts</span>
                   </span>
                 </button>
                 {open && (
-                  <ul className="border-t border-slate-100 px-3 py-2">
+                  <ul className="border-t border-line px-3 py-2">
                     {actions
                       .filter((a) => a.group === g.group)
                       .sort((a, b) => (b.points ?? 0) - (a.points ?? 0))
@@ -405,20 +405,20 @@ export default function ProgressionPanel({
                           key={`${a.rawName}-${i}`}
                           className="flex items-start justify-between gap-3 py-1.5 text-[11px]"
                         >
-                          <span className="min-w-0 flex-1 text-slate-700">
+                          <span className="min-w-0 flex-1 text-ink-muted">
                             {a.name ?? a.rawName}
                             {a.mandatory && (
-                              <span className="ml-1.5 rounded bg-rose-100 px-1 py-0.5 text-[9px] font-semibold text-rose-700">
+                              <span className="ml-1.5 rounded bg-crit-soft-strong px-1 py-0.5 text-[9px] font-semibold text-crit-ink">
                                 MANDATORY
                               </span>
                             )}
                             {a.priority && (
-                              <span className="ml-1.5 rounded bg-violet-100 px-1 py-0.5 text-[9px] font-semibold text-violet-700">
+                              <span className="ml-1.5 rounded bg-flag-soft-strong px-1 py-0.5 text-[9px] font-semibold text-flag-ink">
                                 PRIORITY
                               </span>
                             )}
                           </span>
-                          <span className="shrink-0 tabular-nums text-slate-500">
+                          <span className="shrink-0 tabular-nums text-ink-muted">
                             {a.points ?? "—"}
                           </span>
                         </li>

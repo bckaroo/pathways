@@ -64,13 +64,13 @@ export default async function CommunitiesPage() {
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
       <header className="mb-8">
-        <nav className="mb-4 text-sm text-neutral-500">
+        <nav className="mb-4 text-sm text-ink-muted">
           <Link href="/" className="hover:underline">
             ← Pathways
           </Link>
         </nav>
         <h1 className="text-3xl font-bold tracking-tight">Communities</h1>
-        <p className="mt-2 max-w-3xl text-neutral-600">
+        <p className="mt-2 max-w-3xl text-ink-muted">
           Every municipality tracked in the Climate Smart Communities (CSC) and
           Clean Energy Communities (CEC) programs. Open a community for its
           certification details and completed actions.
@@ -78,9 +78,9 @@ export default async function CommunitiesPage() {
       </header>
 
       {rows === null ? (
-        <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-8 text-center text-sm text-amber-900">
+        <div className="rounded-lg border border-warn-line bg-warn-soft px-4 py-8 text-center text-sm text-warn-ink">
           Database not reachable. Start it with{" "}
-          <code className="rounded bg-amber-100 px-1">docker compose up -d</code>{" "}
+          <code className="rounded bg-warn-soft-strong px-1">docker compose up -d</code>{" "}
           and reload.
         </div>
       ) : (

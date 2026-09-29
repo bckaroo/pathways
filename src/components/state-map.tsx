@@ -178,9 +178,9 @@ function popupHtml(p: CommunityProperties): string {
     : "";
   return (
     `<div class="min-w-44"><strong>${esc(p.name)}</strong>` +
-    `<div class="text-neutral-500">${esc(p.areaType)}${p.county ? ` · ${esc(p.county)} County` : ""}</div>` +
+    `<div class="text-ink-muted">${esc(p.areaType)}${p.county ? ` · ${esc(p.county)} County` : ""}</div>` +
     `<div class="mt-1 space-y-0.5">${cscLine}${cecLine}</div>` +
-    `<a class="mt-2 inline-block font-medium text-emerald-700 hover:underline" href="/communities/${p.uid}">Open profile →</a></div>`
+    `<a class="mt-2 inline-block font-medium text-ok-solid hover:underline" href="/communities/${p.uid}">Open profile →</a></div>`
   );
 }
 
@@ -474,7 +474,7 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
 
   if (failed) {
     return (
-      <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-8 text-center text-sm text-amber-900">
+      <div className="rounded-lg border border-warn-line bg-warn-soft px-4 py-8 text-center text-sm text-warn-ink">
         The map could not be initialized (WebGL unavailable?). Community data
         remains available on the{" "}
         <Link className="font-medium underline" href="/communities">
@@ -490,7 +490,7 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
       {basemapDegraded && (
         <div
           role="status"
-          className="mb-3 rounded-lg border border-sky-300 bg-sky-50 px-4 py-3 text-sm text-sky-900"
+          className="mb-3 rounded-lg border border-info-line bg-info-soft px-4 py-3 text-sm text-info-ink"
         >
           <strong className="font-semibold">Basemap unavailable.</strong>{" "}
           Community data is rendering normally on a simplified background —
@@ -501,7 +501,7 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
       {degraded && (
         <div
           role="status"
-          className="mb-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+          className="mb-3 rounded-lg border border-warn-line bg-warn-soft px-4 py-3 text-sm text-warn-ink"
         >
           <strong className="font-semibold">
             Map data layer did not load.
@@ -516,7 +516,7 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
         </div>
       )}
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex rounded-lg border border-neutral-300 bg-white p-1 shadow-sm">
+        <div className="flex rounded-lg border border-line-strong bg-panel p-1 shadow-sm">
           {(
             [
               ["csc", "CSC certification"],
@@ -529,15 +529,15 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
               onClick={() => setMode(value)}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
                 mode === value
-                  ? "bg-emerald-600 text-white"
-                  : "text-neutral-600 hover:text-neutral-900"
+                  ? "bg-ok-solid text-ok-on-solid"
+                  : "text-ink-muted hover:text-ink"
               }`}
             >
               {label}
             </button>
           ))}
         </div>
-        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-600">
+        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-muted">
           {LEGENDS[mode].map((item) => (
             <li key={item.label} className="flex items-center gap-1.5">
               <span
@@ -552,9 +552,9 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
       </div>
       <div
         ref={containerRef}
-        className="h-[65vh] min-h-[420px] w-full overflow-hidden rounded-lg border border-neutral-300 shadow-sm"
+        className="h-[65vh] min-h-[420px] w-full overflow-hidden rounded-lg border border-line-strong shadow-sm"
       />
-      <p className="mt-2 text-xs text-neutral-500">
+      <p className="mt-2 text-xs text-ink-muted">
         Click a point for a community summary and profile link. Coordinates:
         CSC portal (communities), U.S. Census 2020 Gazetteer centroids
         (CEC-only municipalities).

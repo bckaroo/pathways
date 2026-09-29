@@ -1,26 +1,168 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * THEME TOKENS
+ * ------------
+ * The app previously hardcoded Tailwind light-mode utilities (bg-white,
+ * text-slate-800) while globals.css honoured `prefers-color-scheme: dark` and
+ * set body to near-black. On a dark-mode machine that produced white cards on a
+ * black page with light-on-light text: unreadable.
+ *
+ * Everything now goes through semantic tokens defined once here and mapped to
+ * Tailwind utilities via @theme inline. Adding a colour means adding one token,
+ * not touching nine files.
+ *
+ * NAMING
+ *   surface        page background
+ *   panel          card / section background
+ *   panel-muted    inset strip, table header, code block
+ *   ink            primary text
+ *   ink-muted      secondary text
+ *   ink-subtle     tertiary / disabled text
+ *   line           borders and dividers
+ *   accent         interactive / emphasis (emerald)
+ */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  --surface: #f8fafc;
+  --panel: #ffffff;
+  --panel-muted: #f1f5f9;
+  --ink: #0f172a;
+  --ink-muted: #475569;
+  --ink-subtle: #5d6a7d;
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
+  --accent: #047857;
+  --accent-soft: #ecfdf5;
+
+  /* semaphore tokens: warning / info / success / flag / critical */
+  --warn-soft: #fffbeb;
+  --warn-soft-strong: #fef3c7;
+  --warn-line: #fcd34d;
+  --warn-ink: #78350f;
+  --warn-solid: #d97706;
+
+  --info-soft: #f0f9ff;
+  --info-soft-strong: #e0f2fe;
+  --info-line: #7dd3fc;
+  --info-ink: #0c4a6e;
+  --info-solid: #0284c7;
+
+  --ok-soft: #ecfdf5;
+  --ok-soft-strong: #d1fae5;
+  --ok-line: #6ee7b7;
+  --ok-ink: #064e3b;
+  --ok-solid: #047857;
+  --ok-on-solid: #ffffff;
+
+  --flag-soft-strong: #ede9fe;
+  --flag-ink: #5b21b6;
+  --crit-soft-strong: #ffe4e6;
+  --crit-ink: #9f1239;
+
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --surface: #0b1220;
+    --panel: #131c2e;
+    --panel-muted: #1b2740;
+    --ink: #e8eef8;
+    --ink-muted: #a3b1c6;
+    --ink-subtle: #94a3b8;
+    --line: #263349;
+    --line-strong: #35455f;
+    --accent: #34d399;
+    --accent-soft: #0d2a22;
+
+    --warn-soft: #2a1f08;
+    --warn-soft-strong: #3b2c0c;
+    --warn-line: #a16207;
+    --warn-ink: #fcd34d;
+    --warn-solid: #f59e0b;
+
+    --info-soft: #082033;
+    --info-soft-strong: #0c2b45;
+    --info-line: #0ea5e9;
+    --info-ink: #7dd3fc;
+    --info-solid: #38bdf8;
+
+    --ok-soft: #072a1e;
+    --ok-soft-strong: #0a3a29;
+    --ok-line: #10b981;
+    --ok-ink: #6ee7b7;
+    --ok-solid: #34d399;
+    --ok-on-solid: #06281d;
+
+    --flag-soft-strong: #2a1d4d;
+    --flag-ink: #c4b5fd;
+    --crit-soft-strong: #3d1220;
+    --crit-ink: #fda4af;
+
+    color-scheme: dark;
   }
 }
 
+@theme inline {
+  --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-panel-muted: var(--panel-muted);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-warn-soft: var(--warn-soft);
+  --color-warn-soft-strong: var(--warn-soft-strong);
+  --color-warn-line: var(--warn-line);
+  --color-warn-ink: var(--warn-ink);
+  --color-warn-solid: var(--warn-solid);
+  --color-info-soft: var(--info-soft);
+  --color-info-soft-strong: var(--info-soft-strong);
+  --color-info-line: var(--info-line);
+  --color-info-ink: var(--info-ink);
+  --color-info-solid: var(--info-solid);
+  --color-ok-soft: var(--ok-soft);
+  --color-ok-soft-strong: var(--ok-soft-strong);
+  --color-ok-line: var(--ok-line);
+  --color-ok-ink: var(--ok-ink);
+  --color-ok-solid: var(--ok-solid);
+  --color-ok-on-solid: var(--ok-on-solid);
+  --color-flag-soft-strong: var(--flag-soft-strong);
+  --color-flag-ink: var(--flag-ink);
+  --color-crit-soft-strong: var(--crit-soft-strong);
+  --color-crit-ink: var(--crit-ink);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/*
+ * Applied directly to body rather than relying on a utility class: an unlayered
+ * `body` rule outranks Tailwind's @layer utilities, which is exactly how the
+ * original bg-neutral-50 class got silently overridden and the page went black.
+ */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Chart code uses raw SVG attributes, which cannot hold Tailwind classes. */
+.chart-grid {
+  stroke: var(--line);
+}
+.chart-axis {
+  stroke: var(--line-strong);
+}
+.chart-ink {
+  fill: var(--ink);
+}
+.chart-ink-muted {
+  fill: var(--ink-muted);
+}
+.chart-ink-subtle {
+  fill: var(--ink-subtle);
 }

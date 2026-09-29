@@ -86,15 +86,15 @@ export default async function Home() {
   return (
     <main className="mx-auto max-w-4xl px-6 py-16">
       <header className="mb-10">
-        <p className="text-sm font-medium uppercase tracking-widest text-emerald-700">
+        <p className="text-sm font-medium uppercase tracking-widest text-ok-solid">
           Open source · AGPL-3.0
         </p>
         <h1 className="mt-2 text-4xl font-bold tracking-tight">Pathways</h1>
-        <p className="mt-3 text-lg text-neutral-600">
+        <p className="mt-3 text-lg text-ink-muted">
           A free, self-hostable climate-action dashboard for New York State
           communities, tracking{" "}
           <a
-            className="underline decoration-emerald-600 underline-offset-2"
+            className="underline decoration-ok-solid underline-offset-2"
             href="https://climatesmart.ny.gov"
             target="_blank"
             rel="noreferrer"
@@ -103,7 +103,7 @@ export default async function Home() {
           </a>{" "}
           and{" "}
           <a
-            className="underline decoration-emerald-600 underline-offset-2"
+            className="underline decoration-ok-solid underline-offset-2"
             href="https://www.nyserda.ny.gov/cec"
             target="_blank"
             rel="noreferrer"
@@ -115,12 +115,12 @@ export default async function Home() {
       </header>
 
       {!stats.dbReady && (
-        <div className="mb-8 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <div className="mb-8 rounded-lg border border-warn-line bg-warn-soft px-4 py-3 text-sm text-warn-ink">
           Database not reachable. Start it with{" "}
-          <code className="rounded bg-amber-100 px-1">docker compose up -d</code>, run{" "}
-          <code className="rounded bg-amber-100 px-1">npm run db:migrate</code>, then{" "}
-          <code className="rounded bg-amber-100 px-1">npm run ingest:csc:actions</code> and{" "}
-          <code className="rounded bg-amber-100 px-1">npm run ingest:csc:communities</code>.
+          <code className="rounded bg-warn-soft-strong px-1">docker compose up -d</code>, run{" "}
+          <code className="rounded bg-warn-soft-strong px-1">npm run db:migrate</code>, then{" "}
+          <code className="rounded bg-warn-soft-strong px-1">npm run ingest:csc:actions</code> and{" "}
+          <code className="rounded bg-warn-soft-strong px-1">npm run ingest:csc:communities</code>.
           See the README quickstart.
         </div>
       )}
@@ -128,13 +128,13 @@ export default async function Home() {
       <div className="mb-6 flex flex-wrap gap-3">
         <Link
           href="/map"
-          className="rounded-lg bg-emerald-600 px-5 py-2.5 font-medium text-white shadow-sm transition hover:bg-emerald-700"
+          className="rounded-lg bg-ok-solid px-5 py-2.5 font-medium text-ok-on-solid shadow-sm transition hover:bg-ok-solid"
         >
           Explore the statewide map →
         </Link>
         <Link
           href="/communities"
-          className="rounded-lg border border-neutral-300 bg-white px-5 py-2.5 font-medium text-neutral-700 shadow-sm transition hover:border-neutral-400"
+          className="rounded-lg border border-line-strong bg-panel px-5 py-2.5 font-medium text-ink-muted shadow-sm transition hover:border-neutral-400"
         >
           Browse communities →
         </Link>
@@ -144,38 +144,38 @@ export default async function Home() {
         {cscCards.map((c) => (
           <div
             key={c.label}
-            className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm"
+            className="rounded-xl border border-line bg-panel p-6 shadow-sm"
           >
             <div className="text-3xl font-bold tabular-nums">
               {c.value.toLocaleString("en-US")}
             </div>
             <div className="mt-1 font-medium">{c.label}</div>
-            <div className="text-sm text-neutral-500">{c.hint}</div>
+            <div className="text-sm text-ink-muted">{c.hint}</div>
           </div>
         ))}
       </section>
 
       <section className="mt-10">
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-500">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-muted">
           Clean Energy Communities (historical · program closed)
         </h2>
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {cecCards.map((c) => (
             <div
               key={c.label}
-              className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm"
+              className="rounded-xl border border-line bg-panel p-6 shadow-sm"
             >
               <div className="text-3xl font-bold tabular-nums">
                 {c.value.toLocaleString("en-US")}
               </div>
               <div className="mt-1 font-medium">{c.label}</div>
-              <div className="text-sm text-neutral-500">{c.hint}</div>
+              <div className="text-sm text-ink-muted">{c.hint}</div>
             </div>
           ))}
         </section>
       </section>
 
-      <footer className="mt-12 border-t border-neutral-200 pt-6 text-sm text-neutral-500">
+      <footer className="mt-12 border-t border-line pt-6 text-sm text-ink-muted">
         <p>
           Data sources: NYSDEC Climate Smart Communities program portal
           (climatesmart.ny.gov) and NYSERDA Clean Energy Communities program

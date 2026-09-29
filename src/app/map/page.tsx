@@ -64,16 +64,16 @@ export default async function MapPage() {
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
       <header className="mb-8">
-        <nav className="mb-4 text-sm text-neutral-500">
+        <nav className="mb-4 text-sm text-ink-muted">
           <Link href="/" className="hover:underline">
             ← Pathways
           </Link>
         </nav>
         <h1 className="text-3xl font-bold tracking-tight">Statewide map</h1>
-        <p className="mt-2 max-w-3xl text-neutral-600">
+        <p className="mt-2 max-w-3xl text-ink-muted">
           New York communities in the{" "}
           <a
-            className="underline decoration-emerald-600 underline-offset-2"
+            className="underline decoration-ok-solid underline-offset-2"
             href="https://climatesmart.ny.gov"
             target="_blank"
             rel="noreferrer"
@@ -82,7 +82,7 @@ export default async function MapPage() {
           </a>{" "}
           (CSC) and{" "}
           <a
-            className="underline decoration-emerald-600 underline-offset-2"
+            className="underline decoration-ok-solid underline-offset-2"
             href="https://www.nyserda.ny.gov/cec"
             target="_blank"
             rel="noreferrer"
@@ -95,9 +95,9 @@ export default async function MapPage() {
       </header>
 
       {communities === null ? (
-        <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-8 text-center text-sm text-amber-900">
+        <div className="rounded-lg border border-warn-line bg-warn-soft px-4 py-8 text-center text-sm text-warn-ink">
           Database not reachable. Start it with{" "}
-          <code className="rounded bg-amber-100 px-1">docker compose up -d</code>{" "}
+          <code className="rounded bg-warn-soft-strong px-1">docker compose up -d</code>{" "}
           and reload.
         </div>
       ) : (
@@ -111,12 +111,12 @@ export default async function MapPage() {
             ].map((s) => (
               <div
                 key={s.label}
-                className="rounded-lg border border-neutral-200 bg-white px-4 py-3 shadow-sm"
+                className="rounded-lg border border-line bg-panel px-4 py-3 shadow-sm"
               >
                 <div className="text-2xl font-bold tabular-nums">
                   {s.value.toLocaleString("en-US")}
                 </div>
-                <div className="text-sm text-neutral-500">{s.label}</div>
+                <div className="text-sm text-ink-muted">{s.label}</div>
               </div>
             ))}
           </div>

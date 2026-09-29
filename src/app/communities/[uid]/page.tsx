@@ -37,10 +37,10 @@ function parseStars(stars: string | null | undefined): number {
 }
 
 const BADGES: Record<string, string> = {
-  Gold: "bg-yellow-100 text-yellow-800 ring-yellow-300",
-  Silver: "bg-slate-100 text-slate-600 ring-slate-300",
-  Bronze: "bg-amber-100 text-amber-800 ring-amber-300",
-  Registered: "bg-blue-100 text-blue-700 ring-blue-300",
+  Gold: "bg-warn-soft-strong text-warn-ink ring-warn-line",
+  Silver: "bg-panel-muted text-ink-muted ring-line-strong",
+  Bronze: "bg-warn-soft-strong text-warn-ink ring-warn-line",
+  Registered: "bg-info-soft-strong text-info-ink ring-info-line",
 };
 
 function levelBadgeLabel(level: number | null, levelName: string | null): string {
@@ -66,9 +66,9 @@ export default async function CommunityProfilePage({
   } catch {
     return (
       <main className="mx-auto max-w-5xl px-6 py-10">
-        <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-8 text-center text-sm text-amber-900">
+        <div className="rounded-lg border border-warn-line bg-warn-soft px-4 py-8 text-center text-sm text-warn-ink">
           Database not reachable. Start it with{" "}
-          <code className="rounded bg-amber-100 px-1">docker compose up -d</code>{" "}
+          <code className="rounded bg-warn-soft-strong px-1">docker compose up -d</code>{" "}
           and reload.
         </div>
       </main>
@@ -190,7 +190,7 @@ export default async function CommunityProfilePage({
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
-      <nav className="mb-4 text-sm text-neutral-500">
+      <nav className="mb-4 text-sm text-ink-muted">
         <Link href="/communities" className="hover:underline">
           ← Communities
         </Link>
@@ -202,7 +202,7 @@ export default async function CommunityProfilePage({
 
       <header className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">{base.name}</h1>
-        <p className="mt-1 text-neutral-600">
+        <p className="mt-1 text-ink-muted">
           {base.areaType ? base.areaType[0].toUpperCase() + base.areaType.slice(1) : "Municipality"}
           {base.county ? ` · ${base.county} County` : ""}
           {cec?.region ? ` · ${cec.region} region` : ""}
@@ -214,14 +214,14 @@ export default async function CommunityProfilePage({
 
       <section className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* CSC certification card */}
-        <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500">
+        <div className="rounded-xl border border-line bg-panel p-6 shadow-sm">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-muted">
             Climate Smart Communities (CSC)
           </h2>
           <div className="flex items-baseline gap-3">
             <span
               className={`inline-block rounded-full px-3 py-1 text-sm font-semibold ring-1 ${
-                BADGES[cscBadge] ?? "bg-neutral-100 text-neutral-600 ring-neutral-300"
+                BADGES[cscBadge] ?? "bg-panel-muted text-ink-muted ring-line-strong"
               }`}
             >
               {cscBadge}
@@ -231,20 +231,20 @@ export default async function CommunityProfilePage({
             )}
           </div>
           {cert ? (
-            <dl className="mt-3 space-y-1 text-sm text-neutral-600">
+            <dl className="mt-3 space-y-1 text-sm text-ink-muted">
               <div>
-                <dt className="inline font-medium text-neutral-800">Certified: </dt>
+                <dt className="inline font-medium text-ink">Certified: </dt>
                 <dd className="inline">{formatDate(cert.certifiedOn)}</dd>
               </div>
               <div>
-                <dt className="inline font-medium text-neutral-800">Report: </dt>
+                <dt className="inline font-medium text-ink">Report: </dt>
                 <dd className="inline">
                   {cert.reportUrl ? (
                     <a
                       href={cert.reportUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-emerald-700 hover:underline"
+                      className="text-ok-solid hover:underline"
                     >
                       {cert.name}
                     </a>
@@ -254,12 +254,12 @@ export default async function CommunityProfilePage({
                 </dd>
               </div>
               <div>
-                <dt className="inline font-medium text-neutral-800">Completed actions: </dt>
+                <dt className="inline font-medium text-ink">Completed actions: </dt>
                 <dd className="inline">{cscRows.length.toLocaleString("en-US")}</dd>
               </div>
             </dl>
           ) : (
-            <p className="mt-3 text-sm text-neutral-500">
+            <p className="mt-3 text-sm text-ink-muted">
               {base.portalUid > 0
                 ? "Registered in the CSC program; no certification report on file yet."
                 : "Tracked by CEC only; no CSC participation on record."}
@@ -268,8 +268,8 @@ export default async function CommunityProfilePage({
         </div>
 
         {/* CEC designation card */}
-        <div className="rounded-lg border border-neutral-200 bg-white p-6">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500">
+        <div className="rounded-lg border border-line bg-panel p-6">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-muted">
             Clean Energy Communities (CEC)
           </h2>
           {cec ? (
@@ -278,53 +278,53 @@ export default async function CommunityProfilePage({
                 <span
                   className={`inline-block rounded-full px-3 py-1 text-sm font-semibold ring-1 ${
                     cec.status === "Designated CEC"
-                      ? "bg-emerald-100 text-emerald-800 ring-emerald-300"
-                      : "bg-neutral-100 text-neutral-600 ring-neutral-300"
+                      ? "bg-ok-soft-strong text-ok-ink ring-ok-line"
+                      : "bg-panel-muted text-ink-muted ring-line-strong"
                   }`}
                 >
                   {cec.status === "Designated CEC" ? "Designated" : "Not designated"}
                 </span>
                 {stars > 0 && (
-                  <span className="text-2xl font-bold text-emerald-700">
+                  <span className="text-2xl font-bold text-ok-solid">
                     {"★".repeat(stars)}
                   </span>
                 )}
               </div>
-              <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-neutral-600">
+              <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-ink-muted">
                 <div>
-                  <dt className="inline font-medium text-neutral-800">HIAs approved: </dt>
+                  <dt className="inline font-medium text-ink">HIAs approved: </dt>
                   <dd className="inline">{cec.hiasApproved ?? 0}</dd>
                 </div>
                 <div>
-                  <dt className="inline font-medium text-neutral-800">Points: </dt>
+                  <dt className="inline font-medium text-ink">Points: </dt>
                   <dd className="inline">{cec.pointsAchievedTotal ?? 0}</dd>
                 </div>
                 <div>
-                  <dt className="inline font-medium text-neutral-800">Population: </dt>
+                  <dt className="inline font-medium text-ink">Population: </dt>
                   <dd className="inline">
                     {cec.population != null ? cec.population.toLocaleString("en-US") : "—"}
                   </dd>
                 </div>
                 <div>
-                  <dt className="inline font-medium text-neutral-800">Size: </dt>
+                  <dt className="inline font-medium text-ink">Size: </dt>
                   <dd className="inline">{cec.communitySize ?? "—"}</dd>
                 </div>
                 <div>
-                  <dt className="inline font-medium text-neutral-800">Last HIA: </dt>
+                  <dt className="inline font-medium text-ink">Last HIA: </dt>
                   <dd className="inline">{formatDate(cec.latestActionApprovedOn)}</dd>
                 </div>
                 <div>
-                  <dt className="inline font-medium text-neutral-800">Actions: </dt>
+                  <dt className="inline font-medium text-ink">Actions: </dt>
                   <dd className="inline">{cecActionRows.length.toLocaleString("en-US")}</dd>
                 </div>
               </dl>
-              <p className="mt-2 text-xs text-neutral-400">
+              <p className="mt-2 text-xs text-ink-subtle">
                 CEC program closed; designation and star data are historical
                 (NYSERDA, frozen snapshot).
               </p>
             </>
           ) : (
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-ink-muted">
               No CEC designation record for this community.
             </p>
           )}
@@ -349,15 +349,15 @@ export default async function CommunityProfilePage({
       <section className="mb-10">
         <h2 className="mb-3 text-xl font-semibold">CSC completed actions</h2>
         {cscRows.length === 0 ? (
-          <p className="rounded-lg border border-neutral-200 bg-white px-4 py-6 text-sm text-neutral-500">
+          <p className="rounded-lg border border-line bg-panel px-4 py-6 text-sm text-ink-muted">
             No completed CSC actions on file. Public certification reports exist
             for currently certified communities only.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white shadow-sm">
+          <div className="overflow-x-auto rounded-lg border border-line bg-panel shadow-sm">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-neutral-200 bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
+                <tr className="border-b border-line bg-surface text-left text-xs uppercase tracking-wide text-ink-muted">
                   <th className="px-4 py-2.5 font-medium">Action</th>
                   <th className="px-4 py-2.5 font-medium">Points</th>
                   <th className="px-4 py-2.5 font-medium">Certified</th>
@@ -365,12 +365,12 @@ export default async function CommunityProfilePage({
               </thead>
               <tbody>
                 {cscRows.map((r, i) => (
-                  <tr key={i} className="border-b border-neutral-100 last:border-0">
+                  <tr key={i} className="border-b border-line last:border-0">
                     <td className="px-4 py-2">
                       {r.actionName ?? r.raw}
                       {!r.unmatched && (
                         <span
-                          className="ml-1 text-xs text-neutral-400"
+                          className="ml-1 text-xs text-ink-subtle"
                           title="Raw report name; not in the current action checklist (retired or renamed)"
                         >
                           *
@@ -378,7 +378,7 @@ export default async function CommunityProfilePage({
                       )}
                     </td>
                     <td className="px-4 py-2 tabular-nums">{r.points ?? "—"}</td>
-                    <td className="px-4 py-2 text-neutral-600">{formatDate(r.certifiedOn)}</td>
+                    <td className="px-4 py-2 text-ink-muted">{formatDate(r.certifiedOn)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -386,7 +386,7 @@ export default async function CommunityProfilePage({
           </div>
         )}
         {cscRows.some((r) => !r.unmatched) && (
-          <p className="mt-2 text-xs text-neutral-400">
+          <p className="mt-2 text-xs text-ink-subtle">
             * Action name preserved verbatim from the certification report; not
             matched to the current CSC checklist (retired or renamed action).
           </p>
@@ -397,14 +397,14 @@ export default async function CommunityProfilePage({
       <section className="mb-10">
         <h2 className="mb-3 text-xl font-semibold">CEC completed actions</h2>
         {cecActionRows.length === 0 ? (
-          <p className="rounded-lg border border-neutral-200 bg-white px-4 py-6 text-sm text-neutral-500">
+          <p className="rounded-lg border border-line bg-panel px-4 py-6 text-sm text-ink-muted">
             No CEC high-impact actions on file for this community.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white shadow-sm">
+          <div className="overflow-x-auto rounded-lg border border-line bg-panel shadow-sm">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-neutral-200 bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
+                <tr className="border-b border-line bg-surface text-left text-xs uppercase tracking-wide text-ink-muted">
                   <th className="px-4 py-2.5 font-medium">Action</th>
                   <th className="px-4 py-2.5 font-medium">Category</th>
                   <th className="px-4 py-2.5 font-medium">Points</th>
@@ -413,11 +413,11 @@ export default async function CommunityProfilePage({
               </thead>
               <tbody>
                 {cecActionRows.map((r, i) => (
-                  <tr key={i} className="border-b border-neutral-100 last:border-0">
+                  <tr key={i} className="border-b border-line last:border-0">
                     <td className="px-4 py-2">{r.actionName ?? r.raw}</td>
-                    <td className="px-4 py-2 text-neutral-600">{r.category}</td>
+                    <td className="px-4 py-2 text-ink-muted">{r.category}</td>
                     <td className="px-4 py-2 tabular-nums">{r.points ?? "—"}</td>
-                    <td className="px-4 py-2 text-neutral-600">{formatDate(r.completedOn)}</td>
+                    <td className="px-4 py-2 text-ink-muted">{formatDate(r.completedOn)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -426,7 +426,7 @@ export default async function CommunityProfilePage({
         )}
       </section>
 
-      <footer className="border-t border-neutral-200 pt-6 text-xs text-neutral-500">
+      <footer className="border-t border-line pt-6 text-xs text-ink-muted">
         Data: NYSDEC CSC portal (climatesmart.ny.gov) and NYSERDA Clean Energy
         Communities map/scorecard (program closed, frozen snapshot). Pathways is
         an independent open-source project, not affiliated with NYSDEC or NYSERDA.

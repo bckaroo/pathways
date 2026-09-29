@@ -27,18 +27,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-50 text-neutral-900`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-surface text-ink`}
       >
-        <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/90 backdrop-blur">
+        <header className="sticky top-0 z-40 border-b border-line bg-panel/90 backdrop-blur">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
             <Link href="/" className="text-lg font-bold tracking-tight">
               Pathways
             </Link>
-            <nav className="flex items-center gap-5 text-sm font-medium text-neutral-600">
-              <Link href="/map" className="hover:text-emerald-700">
+            <nav className="flex items-center gap-5 text-sm font-medium text-ink-muted">
+              <Link href="/map" className="hover:text-ok-solid">
                 Map
               </Link>
-              <Link href="/communities" className="hover:text-emerald-700">
+              <Link href="/communities" className="hover:text-ok-solid">
                 Communities
               </Link>
             </nav>

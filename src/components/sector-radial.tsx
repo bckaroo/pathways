@@ -91,10 +91,10 @@ export default function SectorRadial({
   const active = topSectors.filter((t) => t.earned > 0);
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-6">
+    <section className="rounded-xl border border-line bg-panel p-6">
       <header className="mb-4">
         <h2 className="text-lg font-semibold">Emissions sectors addressed</h2>
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="mt-1 text-sm text-ink-muted">
           Which sectors this community&rsquo;s CSC actions actually work on.
           Each spoke is <strong>coverage of that sector</strong> — points earned
           as a share of the points the programme makes available — so every axis
@@ -125,7 +125,7 @@ export default function SectorRadial({
                   .map((pair) => pair)
                   .join(" ")}
                 fill="none"
-                stroke="#e2e8f0"
+                className="chart-grid"
                 strokeWidth={1}
               />
             ))}
@@ -140,7 +140,7 @@ export default function SectorRadial({
                   y1={CY}
                   x2={p.x}
                   y2={p.y}
-                  stroke="#e2e8f0"
+                  className="chart-grid"
                   strokeWidth={1}
                 />
               );
@@ -152,7 +152,7 @@ export default function SectorRadial({
                 .map((p) => `${p.x.toFixed(2)},${p.y.toFixed(2)}`)
                 .join(" ")}
               fill="none"
-              stroke="#cbd5e1"
+              className="chart-axis"
               strokeWidth={1}
               strokeDasharray="4 4"
             />
@@ -160,8 +160,8 @@ export default function SectorRadial({
             {/* the community's coverage polygon */}
             <polygon
               points={polyPoints}
-              fill="rgba(37,99,235,0.18)"
-              stroke="#2563eb"
+              fill="color-mix(in srgb, var(--accent) 18%, transparent)"
+              stroke="var(--accent)"
               strokeWidth={2}
               strokeLinejoin="round"
             />
@@ -176,8 +176,8 @@ export default function SectorRadial({
                   cx={p.x}
                   cy={p.y}
                   r={t.earned > 0 ? (hot ? 7 : 4.5) : 3}
-                  fill={t.earned > 0 ? SECTORS[t.sector].color : "#ffffff"}
-                  stroke={t.earned > 0 ? "#ffffff" : "#94a3b8"}
+                  fill={t.earned > 0 ? SECTORS[t.sector].color : "var(--panel)"}
+                  stroke={t.earned > 0 ? "var(--panel)" : "var(--ink-subtle)"}
                   strokeWidth={2}
                 />
               );
@@ -196,7 +196,7 @@ export default function SectorRadial({
                     y={p.y - 7}
                     textAnchor={anchor}
                     dominantBaseline={baseline}
-                    className="fill-slate-700"
+                    className="chart-ink"
                     style={{ fontSize: 12, fontWeight: 600 }}
                   >
                     {SECTORS[t.sector].short}
@@ -206,7 +206,7 @@ export default function SectorRadial({
                     y={p.y + 8}
                     textAnchor={anchor}
                     dominantBaseline={baseline}
-                    className={untouched ? "fill-slate-400" : "fill-slate-500"}
+                    className={untouched ? "chart-ink-subtle" : "chart-ink-muted"}
                     style={{ fontSize: 11 }}
                   >
                     {untouched ? "none" : `${pct}%`}
@@ -219,7 +219,7 @@ export default function SectorRadial({
               x={CX}
               y={CY - 6}
               textAnchor="middle"
-              className="fill-slate-800"
+              className="chart-ink"
               style={{ fontSize: 20, fontWeight: 700 }}
             >
               {analysis.earnedTotal}
@@ -228,7 +228,7 @@ export default function SectorRadial({
               x={CX}
               y={CY + 12}
               textAnchor="middle"
-              className="fill-slate-500"
+              className="chart-ink-muted"
               style={{ fontSize: 11 }}
             >
               of {analysis.availableTotal} pts
@@ -239,24 +239,24 @@ export default function SectorRadial({
         {/* ---------------- side readout ---------------- */}
         <div className="min-w-0 flex-1">
           <div className="mb-4 grid grid-cols-2 gap-3">
-            <div className="rounded-lg bg-slate-50 px-3 py-2">
-              <div className="text-[11px] uppercase tracking-wide text-slate-500">
+            <div className="rounded-lg bg-panel-muted px-3 py-2">
+              <div className="text-[11px] uppercase tracking-wide text-ink-muted">
                 Sectors touched
               </div>
               <div className="text-lg font-semibold tabular-nums">
                 {active.length}
-                <span className="text-sm font-normal text-slate-400">
+                <span className="text-sm font-normal text-ink-subtle">
                   /{analysis.totals.length}
                 </span>
               </div>
             </div>
-            <div className="rounded-lg bg-slate-50 px-3 py-2">
-              <div className="text-[11px] uppercase tracking-wide text-slate-500">
+            <div className="rounded-lg bg-panel-muted px-3 py-2">
+              <div className="text-[11px] uppercase tracking-wide text-ink-muted">
                 Effort balance
               </div>
               <div className="text-lg font-semibold tabular-nums">
                 {(analysis.spread * 100).toFixed(0)}
-                <span className="text-sm font-normal text-slate-400">/100</span>
+                <span className="text-sm font-normal text-ink-subtle">/100</span>
               </div>
             </div>
           </div>
@@ -282,28 +282,28 @@ export default function SectorRadial({
                         style={{ background: s.color }}
                         aria-hidden
                       />
-                      <span className="truncate font-medium text-slate-700">
+                      <span className="truncate font-medium text-ink-muted">
                         {s.label}
                       </span>
                     </span>
-                    <span className="shrink-0 tabular-nums text-slate-600">
-                      <strong className="text-slate-800">{t.earned}</strong>
-                      <span className="text-slate-400">/{t.available}</span>
+                    <span className="shrink-0 tabular-nums text-ink-muted">
+                      <strong className="text-ink">{t.earned}</strong>
+                      <span className="text-ink-subtle">/{t.available}</span>
                       <span className="ml-2 inline-block w-9 text-right">{pct}%</span>
                     </span>
                   </div>
-                  <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-panel-muted">
                     <div
                       className="h-full rounded-full"
                       style={{ width: `${pct}%`, background: s.color }}
                     />
                   </div>
-                  <div className="mt-0.5 flex gap-3 text-[10px] text-slate-500">
+                  <div className="mt-0.5 flex gap-3 text-[10px] text-ink-muted">
                     <span>
                       {t.actionsDone}/{t.actionsAvailable} actions
                     </span>
                     {t.priorityTotal > 0 && <span>{t.priorityTotal} priority available</span>}
-                    {t.fundingAvailable && <span className="text-emerald-600">grant-eligible</span>}
+                    {t.fundingAvailable && <span className="text-ok-solid">grant-eligible</span>}
                   </div>
                 </li>
               );
@@ -314,20 +314,20 @@ export default function SectorRadial({
 
       {/* ---------------- gaps ---------------- */}
       {analysis.untouched.length > 0 && (
-        <div className="mt-5 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3">
-          <div className="text-sm font-medium text-amber-900">
+        <div className="mt-5 rounded-lg border border-warn-line bg-warn-soft px-4 py-3">
+          <div className="text-sm font-medium text-warn-ink">
             {analysis.untouched.length === 1
               ? "One sector has no action at all"
               : `${analysis.untouched.length} sectors have no action at all`}
           </div>
-          <p className="mt-1 text-xs text-amber-900">
+          <p className="mt-1 text-xs text-warn-ink">
             {analysis.untouched.map((k) => SECTORS[k].label).join(" · ")}
           </p>
         </div>
       )}
 
       {/* ---------------- provenance ---------------- */}
-      <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
+      <div className="mt-4 rounded-lg border border-line bg-panel-muted px-4 py-3 text-xs text-ink-muted">
         <p>
           Sector assignment is <strong>curated per action</strong>, not derived
           from pledge element — PE3 contains both fleet and building actions, and
@@ -335,11 +335,11 @@ export default function SectorRadial({
           sector would misattribute them. All {catalogue.length} actions are
           mapped; see <code>src/lib/csc-sectors.json</code>.
         </p>
-        <p className="mt-1 text-slate-500">
+        <p className="mt-1 text-ink-muted">
           Governance &amp; Planning and Adaptation &amp; Resilience are included
           for completeness but are not emitting sectors.
           {analysis.unmapped > 0 && (
-            <span className="text-amber-700">
+            <span className="text-warn-ink">
               {" "}
               {analysis.unmapped} action{analysis.unmapped === 1 ? "" : "s"} could
               not be mapped and {analysis.unmapped === 1 ? "is" : "are"} excluded.

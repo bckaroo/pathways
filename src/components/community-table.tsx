@@ -21,10 +21,10 @@ export type CommunityRow = {
 const TYPES = ["city", "town", "village", "county"] as const;
 
 function cscBadgeClass(label: string): string {
-  if (label === "Gold") return "bg-yellow-100 text-yellow-800 ring-yellow-300";
-  if (label === "Silver") return "bg-slate-100 text-slate-600 ring-slate-300";
-  if (label === "Bronze") return "bg-amber-100 text-amber-800 ring-amber-300";
-  return "bg-blue-100 text-blue-700 ring-blue-300"; // Registered
+  if (label === "Gold") return "bg-warn-soft-strong text-warn-ink ring-warn-line";
+  if (label === "Silver") return "bg-panel-muted text-ink-muted ring-line-strong";
+  if (label === "Bronze") return "bg-warn-soft-strong text-warn-ink ring-warn-line";
+  return "bg-info-soft-strong text-info-ink ring-info-line"; // Registered
 }
 
 export default function CommunityTable({ rows }: { rows: CommunityRow[] }) {
@@ -53,12 +53,12 @@ export default function CommunityTable({ rows }: { rows: CommunityRow[] }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search name or county…"
-          className="w-64 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-emerald-600 focus:outline-none"
+          className="w-64 rounded-lg border border-line-strong bg-panel px-3 py-2 text-sm shadow-sm focus:border-ok-line focus:outline-none"
         />
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
-          className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm shadow-sm"
+          className="rounded-lg border border-line-strong bg-panel px-3 py-2 text-sm shadow-sm"
           aria-label="Filter by municipality type"
         >
           <option value="all">All types</option>
@@ -71,32 +71,32 @@ export default function CommunityTable({ rows }: { rows: CommunityRow[] }) {
         <select
           value={cecFilter}
           onChange={(e) => setCecFilter(e.target.value)}
-          className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm shadow-sm"
+          className="rounded-lg border border-line-strong bg-panel px-3 py-2 text-sm shadow-sm"
           aria-label="Filter by CEC status"
         >
           <option value="all">CEC: any</option>
           <option value="designated">CEC: designated</option>
           <option value="starred">CEC: ★ 1–5</option>
         </select>
-        <label className="flex items-center gap-2 text-sm text-neutral-600">
+        <label className="flex items-center gap-2 text-sm text-ink-muted">
           <input
             type="checkbox"
             checked={certifiedOnly}
             onChange={(e) => setCertifiedOnly(e.target.checked)}
-            className="h-4 w-4 rounded border-neutral-300"
+            className="h-4 w-4 rounded border-line-strong"
           />
           Certified only
         </label>
-        <span className="ml-auto text-sm text-neutral-500">
+        <span className="ml-auto text-sm text-ink-muted">
           Showing {filtered.length.toLocaleString("en-US")} of{" "}
           {rows.length.toLocaleString("en-US")}
         </span>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-lg border border-line bg-panel shadow-sm">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-neutral-200 bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
+            <tr className="border-b border-line bg-surface text-left text-xs uppercase tracking-wide text-ink-muted">
               <th className="px-4 py-2.5 font-medium">Community</th>
               <th className="px-4 py-2.5 font-medium">Type</th>
               <th className="px-4 py-2.5 font-medium">County</th>
@@ -106,14 +106,14 @@ export default function CommunityTable({ rows }: { rows: CommunityRow[] }) {
           </thead>
           <tbody>
             {filtered.map((r) => (
-              <tr key={r.uid} className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50">
+              <tr key={r.uid} className="border-b border-line last:border-0 hover:bg-panel-muted">
                 <td className="px-4 py-2 font-medium">
-                  <Link href={`/communities/${r.uid}`} className="text-emerald-800 hover:underline">
+                  <Link href={`/communities/${r.uid}`} className="text-ok-ink hover:underline">
                     {r.name}
                   </Link>
                 </td>
-                <td className="px-4 py-2 capitalize text-neutral-600">{r.areaType ?? "—"}</td>
-                <td className="px-4 py-2 text-neutral-600">{r.county ?? "—"}</td>
+                <td className="px-4 py-2 capitalize text-ink-muted">{r.areaType ?? "—"}</td>
+                <td className="px-4 py-2 text-ink-muted">{r.county ?? "—"}</td>
                 <td className="px-4 py-2">
                   {r.cscLabel ? (
                     <span
@@ -122,24 +122,24 @@ export default function CommunityTable({ rows }: { rows: CommunityRow[] }) {
                       {r.cscLabel}
                     </span>
                   ) : (
-                    <span className="text-neutral-400">—</span>
+                    <span className="text-ink-subtle">—</span>
                   )}
                 </td>
                 <td className="px-4 py-2">
                   {r.cecLabel ? (
-                    <span className="inline-block rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-800 ring-1 ring-emerald-200">
+                    <span className="inline-block rounded-full bg-ok-soft px-2 py-0.5 text-xs font-medium text-ok-ink ring-1 ring-ok-line">
                       {r.cecLabel}
                       {r.cecStars > 0 ? ` ${"★".repeat(r.cecStars)}` : ""}
                     </span>
                   ) : (
-                    <span className="text-neutral-400">—</span>
+                    <span className="text-ink-subtle">—</span>
                   )}
                 </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-neutral-500">
+                <td colSpan={5} className="px-4 py-8 text-center text-ink-muted">
                   No communities match the current filters.
                 </td>
               </tr>
