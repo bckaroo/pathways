@@ -8,6 +8,17 @@
 # the browser-driven checks die with an unhelpful ImportError — or worse, a
 # different interpreter silently changes behaviour between runs.
 #
+# A second, subtler cause on this host: Hermes exports PYTHONPATH pointing at
+# its own 3.14 venv's site-packages. That leaks into EVERY python started under
+# it, so an unrelated interpreter (conda's 3.13, say) resolves a pure-Python
+# package from 3.14 and then fails to find its compiled extension, because the
+# .so is tagged for the running interpreter. Symptom: "No module named
+# 'pydantic_core._pydantic_core'" from conda's own entry-point hooks.
+#
+# The defence is the same in both cases: PROBE, never assume. Each candidate is
+# asked to actually import what the target script needs. A poisoned interpreter
+# fails the probe and is skipped rather than selected.
+#
 # Usage:  scripts/_python.sh <script.py> [args...]
 #
 # Resolution order: $PATHWAYS_PYTHON, then any candidate that can import
