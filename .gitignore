@@ -49,6 +49,12 @@ ingest/.venv/
 __pycache__/
 *.pyc
 
+# The env TEMPLATE must ship: README tells users to `cp .env.example .env`,
+# and .gitignore's own `.env*` / `.env` patterns would otherwise exclude it,
+# leaving a fresh clone unable to start. Negation has to come AFTER every
+# pattern it needs to override — order matters in .gitignore.
+!.env.example
+
 # Vendored MapLibre v6 worker (copied from node_modules by
 # scripts/vendor-maplibre-worker.mjs, wired to `postinstall`).
 # NOT committed: it is a verbatim third-party bundle that `npm install`

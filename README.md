@@ -43,17 +43,30 @@ npm run dev                   # http://localhost:3005
 
 ## Dashboard (v1)
 
-- **Statewide map** (`/map`): one point per municipality over a free
-  CARTO/OpenStreetMap raster basemap; color modes toggle between CSC
+- **Statewide map** (`/map`): one point per municipality over a keyless
+  OpenFreeMap vector basemap (MapLibre + OpenMapTiles schema, free
+  `admin_level` 4/6/7/8 boundary layers); color modes toggle between CSC
   certification level (Registered/Bronze/Silver/Gold) and CEC designation +
   Advanced (v3.0) stars. Click a point for a summary popup linking to the
   community profile.
 - **Communities index** (`/communities`): searchable/filterable table of all
   tracked municipalities.
 - **Community profiles** (`/communities/[uid]`): CSC certification badge,
-  points and report link; completed CSC actions (unmatched legacy names are
-  preserved verbatim); CEC designation card (stars, HIAs, points, population)
-  and completed CEC actions.
+  points and report link; **certification skill tree**; **sector radial**;
+  completed CSC actions (unmatched legacy names are preserved verbatim); CEC
+  designation card (stars, HIAs, points, population) and completed CEC actions.
+- **Certification skill tree** (`src/components/progression-panel.tsx`): CSC
+  certification modelled as a tech tree rather than a scoreboard. Every level
+  requires four things at once — points, breadth (distinct pledge elements),
+  mandatory actions and priority actions — so each level card shows a
+  requirement ring and "Next unlock" names the *closest unmet requirement*,
+  not just the point gap. Gold is modelled as unreachable because NYSDEC lists
+  it as under development.
+- **Sector radial** (`src/components/sector-radial.tsx`): an 8-spoke coverage
+  view of which emissions sectors a community's actions actually address, with
+  the programme's per-sector offering drawn as the outer ring. Sector
+  assignment is **curated per action**, not derived from pledge element — see
+  "Sectors are not pledge elements" below.
 - Pages are server-rendered on demand (`force-dynamic`) so the UI always
   reflects the database; the build stays clean even without Postgres running
   (pages degrade to a "database not reachable" notice).
@@ -62,7 +75,46 @@ npm run dev                   # http://localhost:3005
   the U.S. Census 2020 Gazetteer (NY FIPS 36; towns join on state+MCD code,
   villages/cities on place GEOID, counties on county GEOID) with a
   name-matching fallback (`ingest/geocode.py`, idempotent).
-```
+
+### Sectors are not pledge elements
+
+A community's CSC actions are grouped under ten **pledge elements** (PE1–PE10),
+which are *process* categories — a task force, an inventory, outreach — not
+emitting sectors. Mapping a sector chart straight off the pledge element is
+wrong, and provably so:
+
+| Pledge element | Contains actions that belong elsewhere |
+|---|---|
+| PE3 "Decrease energy use" | Fleet Inventory (transportation), HVAC upgrades (buildings) |
+| PE6 "Implement climate-smart land use" | EV charging stations, public transit access (both transportation) |
+| PE1, PE9 | Governance and outreach — no emitting sector at all |
+
+So all 124 CSC actions are mapped **one at a time** to GPC-style sectors in
+`src/lib/csc-sectors.json`, 1:1 with the catalogue. The legacy manual numbering
+(`3.1 Buildings and Stationary Equipment`, …) also looks like a sector key but
+is unusable: 19 of 124 actions have no legacy number, and they are precisely the
+newest ones (Thermal Energy Networks, Refrigerant Management, Organics
+Management).
+
+### Theming
+
+Light and dark are both supported. Colours go through semantic tokens defined
+once in `src/app/globals.css` (`surface`, `panel`, `ink`/`ink-muted`/`ink-subtle`,
+`line`, plus warn/info/ok/flag/crit families) and mapped to utilities via
+`@theme inline`. `npm run audit:contrast` measures every rendered text node in
+both schemes and fails below WCAG AA — vision review cannot measure a contrast
+ratio, and once reported "no visual defects" on a page that was unreadable.
+
+### Verification
+
+| Command | What it proves |
+|---|---|
+| `npm run validate:csc` | The level rule engine reproduces all 185 certified communities' levels, with zero false "can level up" |
+| `npm run verify:csc` | The action catalogue and crosswalk match NYSDEC's published XLSX/PDF artefacts |
+| `npm run verify:ghg` | 31 assertions about the GHG inventory datasets (grain, accounting traps, aliases) |
+| `npm run audit:contrast` | Every text node meets WCAG AA in both colour schemes |
+| `npm run smoke:map` | The map renders community points over a live basemap |
+| `npm run test:fallback` | Community data survives a basemap outage, and the user is told |
 
 ### Ports
 
