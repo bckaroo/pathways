@@ -240,13 +240,19 @@ with sync_playwright() as p:
             try {
                 rendered = m.queryRenderedFeatures({ layers: ['communities'] }).length;
             } catch (e) { rendered = -1; }
+            const srcNames = Object.keys(style.sources || {});
             return {
                 handle: true,
                 styleLoaded: m.isStyleLoaded(),
-                hasSource: !!(style.sources && style.sources['communities']),
+                hasSource: srcNames.includes('communities'),
                 hasLayer: (style.layers || []).some(l => l.id === 'communities'),
                 sourceLoaded: m.isSourceLoaded('communities'),
                 rendered,
+                // Basemap health: the OpenFreeMap style brings ~55 layers and
+                // a vector source. If the fallback kicked in, we get ~4 layers
+                // and no 'openmaptiles' source.
+                layerCount: (style.layers || []).length,
+                hasVectorBasemap: srcNames.includes('openmaptiles'),
             };
         }"""
     )
@@ -285,6 +291,18 @@ else:
         )
     else:
         ok(f"map rendered {rendered} community features")
+
+    # Basemap health. Data rendering on the FALLBACK surface is a degraded
+    # state, not a pass: the user sees no roads, water, or labels. Report it
+    # rather than letting a green "points rendered" hide a dead basemap.
+    if not state.get("hasVectorBasemap"):
+        bad(
+            f"vector basemap missing — only {state.get('layerCount')} style layers "
+            f"and no 'openmaptiles' source. The OpenFreeMap fallback has kicked in, "
+            f"or the tile host is unreachable."
+        )
+    else:
+        ok(f"vector basemap loaded ({state.get('layerCount')} style layers)")
 
 if console_errors:
     print("\n[smoke:map] console errors seen:")

@@ -19,10 +19,60 @@ import {
   Popup,
   type GeoJSONSource,
   type MapLayerMouseEvent,
+  type StyleSpecification,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import NY_FRAME from "@/lib/ny-frame.json";
 import { setWorkerUrl } from "maplibre-gl";
+
+// ---------------------------------------------------------------------------
+// Basemap: OpenFreeMap public instance.
+//
+// Why this and not a keyed provider: it is keyless, registration-free, has no
+// request limits, the whole stack is MIT-licensed and self-hostable, and the
+// style URL is version-stable — `/styles/<name>` resolves server-side to the
+// current weekly planet build via a TileJSON pointer, so nothing needs bumping
+// when tiles are rebuilt. Verified live 2026-09-28.
+//
+// Self-hosting is a one-line change to this constant. That is the point: for a
+// self-hostable public good the dependency must be a URL, not an account.
+//
+// To pin a specific planet build instead of tracking latest, replace with e.g.
+//   https://tiles.openfreemap.org/planet/20260913_164504_pt  (as a TileJSON URL)
+// Archived dated builds remain served, so pinning is safe.
+//
+// Styles available: liberty | bright | positron | dark | fiord
+// positron is the muted light style; it keeps our data layer legible.
+export const OFM_STYLE_URL = "https://tiles.openfreemap.org/styles/positron";
+
+// Fallback style for when the basemap is unreachable. Keeps the data layer
+// visible on a plain surface instead of showing the user a blank canvas —
+// the lesson from the CARTO incident, where a failing basemap silently took
+// the community points down with it.
+const OFFLINE_STYLE: StyleSpecification = {
+  version: 8,
+  sources: {
+    "ny-frame": {
+      type: "geojson",
+      data: NY_FRAME as GeoJSON.FeatureCollection,
+    },
+  },
+  layers: [
+    { id: "background", type: "background", paint: { "background-color": "#f4f6f9" } },
+    {
+      id: "ny-frame-fill",
+      type: "fill",
+      source: "ny-frame",
+      paint: { "fill-color": "#e6ecf4", "fill-opacity": 1 },
+    },
+    {
+      id: "ny-frame-outline",
+      type: "line",
+      source: "ny-frame",
+      paint: { "line-color": "#b9c6d6", "line-width": 1.2 },
+    },
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // MapLibre v6 worker registration — REQUIRED, and the cause of the blank map.
@@ -161,6 +211,10 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
   // Degraded = map mounted but the community data layer never attached.
   // Distinct from `failed` (WebGL/constructor error). Both are visible.
   const [degraded, setDegraded] = useState(false);
+  // basemapDegraded = community points ARE rendering, but on the fallback
+  // surface because the tile host was unreachable. Distinct from `degraded`:
+  // data is fine, the pretty map is missing.
+  const [basemapDegraded, setBasemapDegraded] = useState(false);
   const timeoutsRef = useRef<number[]>([]);
 
   const geojson = useMemo<GeoJSON.FeatureCollection<GeoJSON.Point, CommunityProperties>>(
@@ -193,68 +247,42 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
     try {
       map = new MapLibreMap({
         container,
-        style: {
-          version: 8,
-          // SELF-HOSTED, KEYLESS BASEMAP.
-          //
-          // This previously used CARTO's keyless raster tiles at
-          // basemaps.cartocdn.com. CARTO changed policy and now returns a
-          // 256x256 "API KEY REQUIRED" watermark PNG for keyless requests —
-          // as HTTP 200, so nothing looked broken to a status check while
-          // the map rendered blank. The openstreetmap.org fallback was also
-          // rejected (403 tile usage policy), as was StadiaMaps (401).
-          //
-          // For a self-hostable public-good, depending on a third-party key
-          // per deployment is the wrong architecture: every municipality
-          // would need their own key and the map would break on any provider
-          // policy change. So the basemap is now:
-          //   - a flat background colour from the style spec, plus
-          //   - /ny-frame.geojson, a small state-outline polygon generated
-          //     from the municipality centroids already in our database.
-          //
-          // No external tile requests, no key, works offline. The frame is a
-          // visual spatial reference, not a survey boundary (see README).
-          sources: {
-            "ny-frame": {
-              type: "geojson",
-              // INLINE, NOT A FETCH. Imported as a module rather than fetched
-              // from /ny-frame.geojson.
-              //
-              // Why: fetching the URL never worked. The source was created but
-              // stayed at loaded=false forever, no error event fired, and no
-              // network request was ever issued — so the style's "load" event
-              // never completed and the entire community layer was skipped
-              // silently. A 538-byte static polygon has no business making a
-              // network round-trip anyway: inlining removes the failure mode
-              // entirely and works offline by construction.
-              data: NY_FRAME as GeoJSON.FeatureCollection,
-            },
-          },
-          layers: [
-            {
-              id: "background",
-              type: "background",
-              paint: { "background-color": "#f4f6f9" },
-            },
-            {
-              id: "ny-frame-fill",
-              type: "fill",
-              source: "ny-frame",
-              paint: { "fill-color": "#e6ecf4", "fill-opacity": 1 },
-            },
-            {
-              id: "ny-frame-outline",
-              type: "line",
-              source: "ny-frame",
-              paint: { "line-color": "#b9c6d6", "line-width": 1.2 },
-            },
-          ],
-        },
+        // ------------------------------------------------------------------
+        // BASEMAP: OpenFreeMap (https://openfreemap.org) — real vector tiles,
+        // no API key, no registration, no request limits, MIT-licensed stack,
+        // and self-hostable with the same style URL.
+        //
+        // History of this line, because it matters:
+        //   1. CARTO keyless raster — CARTO changed policy and began returning
+        //      a 256x256 "API KEY REQUIRED" watermark PNG *as HTTP 200*, so
+        //      nothing looked broken while the map rendered blank.
+        //   2. OSM raster (403 tile usage policy) and StadiaMaps (401) — also
+        //      gated. Every keyless raster provider is now closed.
+        //   3. Hand-rolled inline GeoJSON frame — a convex hull of our own
+        //      municipality centroids. Honest but not a real boundary, and it
+        //      had no geography: no roads, water, or place labels.
+        //   4. THIS: OpenFreeMap vector tiles. Verified live 2026-09-28 —
+        //      245 KB tiles of real MVT data, CORS `*`, and its /planet
+        //      TileJSON resolves dynamically to the current weekly build, so
+        //      the style URL is version-stable and needs no maintenance.
+        //
+        // Verified the boundary layer carries `admin_level`, which gives us
+        // real administrative geography straight from the basemap:
+        //   admin_level 4 = state, 6 = county, 7 = municipality, 8 = village
+        // — the same four levels as the GHG inventory grains. The GHG work no
+        // longer needs a separate boundary dataset to draw its extents.
+        //
+        // Self-hosting note: swapping to a self-hosted instance is a one-line
+        // change to this URL, which is what "self-hostable public good"
+        // actually requires. The dependency is a URL, not an account.
+        // ------------------------------------------------------------------
+        style: OFM_STYLE_URL,
         center: [-75.45, 42.93],
         zoom: 5.9,
-        minZoom: 5,
+        minZoom: 4,
         maxZoom: 14,
-        attributionControl: false,
+        // Attribution is required by OpenFreeMap/OpenStreetMap/OpenMapTiles.
+        attributionControl: { compact: true },
       });
     } catch {
       setFailed(true);
@@ -265,12 +293,55 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
     map.addControl(new NavigationControl({ showCompass: false }), "top-right");
 
     // Dev-only handle for the rendered-map smoke test
-    // (scripts/smoke-map.mjs). Without this, an automated check can only
+    // (scripts/smoke_map.py). Without this, an automated check can only
     // sample canvas pixels — it cannot assert that the source loaded or that
     // queryRenderedFeatures() returns features. Not exposed in production.
     if (process.env.NODE_ENV !== "production") {
       (window as unknown as { __pathwaysMap?: MapLibreMap }).__pathwaysMap = map;
     }
+
+    // ------------------------------------------------------------------
+    // BASEMAP FALLBACK
+    //
+    // If the tile host is unreachable (offline, DNS, provider outage), swap to
+    // a self-contained style so the community points still render on a plain
+    // surface. This is deliberately NOT a silent fallback: `basemapDegraded`
+    // is surfaced in the UI, because a map with no roads or labels looks
+    // broken and the user should know why.
+    //
+    // The failure we are protecting against is specific: previously a
+    // failing basemap took the data layer down with it and the page still
+    // returned HTTP 200. Data must survive a basemap failure.
+    // ------------------------------------------------------------------
+    let basemapSwapped = false;
+    const swapToOfflineBasemap = () => {
+      if (basemapSwapped) return;
+      basemapSwapped = true;
+      try {
+        map.setStyle(OFFLINE_STYLE, { diff: false });
+        setBasemapDegraded(true);
+      } catch {
+        /* if even this fails, the degraded banner below still reports it */
+      }
+    };
+
+    map.on("error", (e: { error?: { message?: string; status?: number } }) => {
+      const msg = e?.error?.message ?? "";
+      const status = e?.error?.status;
+      // Only treat tile/style-source failures as basemap failures. A missing
+      // glyph or sprite must not trigger a wholesale style swap.
+      const isBasemapFailure =
+        status === 404 ||
+        /tiles\.openfreemap\.org|Failed to fetch|NetworkError|ERR_/i.test(msg);
+      if (isBasemapFailure) swapToOfflineBasemap();
+    });
+
+    // If the style has not finished loading in time, assume the host is
+    // unreachable and fall back rather than hanging on an empty canvas.
+    const basemapDeadline = window.setTimeout(() => {
+      if (!map.isStyleLoaded()) swapToOfflineBasemap();
+    }, 8000);
+    timeoutsRef.current.push(basemapDeadline);
 
     // ------------------------------------------------------------------
     // SILENT-FAILURE GUARD (added after DEV-151 shipped a blank map as
@@ -291,8 +362,19 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
     let settled = false;
 
     const addCommunityLayer = () => {
-      if (settled || !map.isStyleLoaded()) return false;
-      if (map.getLayer("communities")) { settled = true; return true; }
+      // NOTE: must NOT early-return on `settled` alone. map.setStyle() wipes
+      // every custom source and layer, so after a basemap fallback the
+      // community layer has to be re-added. Guarding only on `settled` would
+      // leave the map rendering no points while everything still looked
+      // healthy — the exact silent-failure class this file exists to prevent.
+      // Guard on the actual layer presence instead.
+      if (!map.isStyleLoaded()) return false;
+      if (map.getLayer("communities")) {
+        settled = true;
+        setReady(true);
+        return true;
+      }
+      settled = false;
       try {
         map.addSource("communities", {
           type: "geojson",
@@ -335,13 +417,18 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
     };
 
     map.on("load", addCommunityLayer);
-    // Poll as a fallback: some basemap failures leave the style loaded but
-    // the load event unhelpfully delayed or dropped.
+    // Poll rather than relying on a single event, and do NOT stop polling on
+    // first success: map.setStyle() (the basemap fallback) destroys the
+    // community layer, and this poll is what puts it back. Clearing it after
+    // the first success would strand the fallback case with no data.
+    let polls = 0;
     const poll = window.setInterval(() => {
-      if (addCommunityLayer()) window.clearInterval(poll);
+      polls += 1;
+      addCommunityLayer();
+      // Give up eventually so we do not poll forever on a dead map.
+      if (settled && polls > 120) window.clearInterval(poll);
     }, 250);
     const deadline = window.setTimeout(() => {
-      window.clearInterval(poll);
       if (!settled) {
         // Data layer never attached. Say so, loudly, in the UI.
         setDegraded(true);
@@ -400,6 +487,17 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
 
   return (
     <div>
+      {basemapDegraded && (
+        <div
+          role="status"
+          className="mb-3 rounded-lg border border-sky-300 bg-sky-50 px-4 py-3 text-sm text-sky-900"
+        >
+          <strong className="font-semibold">Basemap unavailable.</strong>{" "}
+          Community data is rendering normally on a simplified background —
+          roads, water and place labels are missing because the tile host could
+          not be reached.
+        </div>
+      )}
       {degraded && (
         <div
           role="status"
