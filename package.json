@@ -10,6 +10,7 @@
     "vendor:maplibre": "node scripts/vendor-maplibre-worker.mjs",
     "postinstall": "node scripts/vendor-maplibre-worker.mjs",
     "smoke:map": "python3 scripts/smoke_map.py",
+    "verify:ghg": "python3 scripts/verify_ghg_sources.py",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
