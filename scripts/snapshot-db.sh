@@ -84,13 +84,49 @@ cmd_dump() {
   # source database -- it assumes the destination has it too. So a fresh restore
   # fails with 'schema "drizzle" does not exist'. Prepend the schema creation
   # ourselves, guarded so it is a no-op when the schema is already there.
+  #
+  # The dump is also made IDEMPOTENT so it can be applied over an existing
+  # schema. That matters because the documented order is `db:migrate` (which
+  # creates the tables) followed by a restore -- and pg_dump's bare CREATE TABLE
+  # then fails with 'relation "__drizzle_migrations" already exists'. Dropping
+  # the migrate step instead would break self-hosters who need the schema.
+  #
+  # pg_dump always emits a plain `CREATE TABLE public.foo (...)` with no
+  # IF NOT EXISTS, so we rewrite the CREATE statements in the stream. Only
+  # CREATE TABLE / CREATE INDEX / CREATE UNIQUE INDEX / CREATE SEQUENCE are
+  # touched; COPY is already append-only and INSERT-free, and a re-run against
+  # populated tables is handled by the TRUNCATE-free upsert-free design of the
+  # data (the tables are dropped and recreated, i.e. fully replaced).
   {
     echo "CREATE SCHEMA IF NOT EXISTS drizzle;"
+    echo "SET client_min_messages = warning;"
   } > "$tmp"
 
   local args=(--no-owner --no-privileges --schema=public --schema=drizzle)
   for t in "${TABLES[@]}"; do args+=(--table="$t"); done
-  docker exec "$CONTAINER" pg_dump -U "$DB_USER" -d "$DB_NAME" "${args[@]}" >> "$tmp"
+  docker exec "$CONTAINER" pg_dump -U "$DB_USER" -d "$DB_NAME" "${args[@]}" > "${tmp}.raw"
+
+  # Make the schema statements re-applicable. A dump restored over an existing
+  # schema (migrated, then restored) otherwise dies on the first CREATE TABLE.
+  # We replace leftover tables outright rather than merging: the snapshot is the
+  # whole dataset, so a half-merged restore would silently produce a mixture of
+  # two data vintages, which is worse than a clear failure.
+  python3 - "$tmp" "${tmp}.raw" <<'PY'
+import re, sys
+out_path, raw_path = sys.argv[1], sys.argv[2]
+with open(out_path, "a", encoding="utf-8") as out, \
+     open(raw_path, encoding="utf-8") as raw:
+    for line in raw:
+        if re.match(r"^CREATE TABLE ", line):
+            stmt = line.replace("CREATE TABLE ", "DROP TABLE IF EXISTS ", 1)
+            # DROP first, then the original CREATE, so the shape always matches
+            # the snapshot rather than whatever the migrations produced.
+            out.write(stmt.rstrip("\n").split(" (")[0] + " CASCADE;\n")
+            out.write(line)
+        else:
+            out.write(line)
+PY
+  rm -f "${tmp}.raw"
   gzip -9 -c "$tmp" > "$OUT"
   rm -f "$tmp"
 
