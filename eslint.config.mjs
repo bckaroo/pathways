@@ -18,6 +18,11 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      // Vendored MapLibre v6 worker + its sibling chunk, copied verbatim
+      // from node_modules into public/ so the worker resolves by relative
+      // path. Never hand-edited — excluded so its minified internals don't
+      // drown real lint output (1,123 noise warnings before this).
+      "public/maplibre/**",
     ],
   },
 ];

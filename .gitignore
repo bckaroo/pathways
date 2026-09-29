@@ -48,3 +48,12 @@ ingest/data/
 ingest/.venv/
 __pycache__/
 *.pyc
+
+# Vendored MapLibre v6 worker (copied from node_modules by
+# scripts/vendor-maplibre-worker.mjs, wired to `postinstall`).
+# NOT committed: it is a verbatim third-party bundle that `npm install`
+# regenerates, and 500 KB of minified upstream code does not belong in this
+# repo's history. If you vendor by hand, run `npm run vendor:maplibre`.
+# The file MUST be present at serve time or the map renders blank with no
+# error — see scripts/smoke_map.py.
+/public/maplibre/

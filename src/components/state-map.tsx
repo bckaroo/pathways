@@ -21,6 +21,29 @@ import {
   type MapLayerMouseEvent,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import NY_FRAME from "@/lib/ny-frame.json";
+import { setWorkerUrl } from "maplibre-gl";
+
+// ---------------------------------------------------------------------------
+// MapLibre v6 worker registration — REQUIRED, and the cause of the blank map.
+//
+// MapLibre v6 ships as ESM only and does all source/tile parsing in a Web
+// Worker (dist/maplibre-gl-worker.mjs), which itself imports a sibling chunk
+// (dist/maplibre-gl-shared.mjs) by RELATIVE path. Inside a bundler,
+// `import.meta.url` does not reliably resolve to that worker file, so the
+// worker request 404s.
+//
+// The failure mode is uniquely nasty: the main module loads, the style loads,
+// the canvas paints, the source is *created* — but the source never finishes
+// loading (loaded=false forever) and NO error is emitted anywhere. The
+// style's "load" event therefore never fires, so the entire data layer is
+// silently skipped while the page still returns HTTP 200. That is exactly how
+// DEV-151 reported this map as "verified".
+//
+// Both files are copied to public/maplibre/ (see the copy-maplibre-worker
+// script) because the worker's relative import requires them side by side.
+// ---------------------------------------------------------------------------
+setWorkerUrl("/maplibre/maplibre-gl-worker.mjs");
 
 export type MapCommunity = {
   uid: number;
@@ -135,6 +158,10 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
   const [mode, setMode] = useState<MapMode>("csc");
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  // Degraded = map mounted but the community data layer never attached.
+  // Distinct from `failed` (WebGL/constructor error). Both are visible.
+  const [degraded, setDegraded] = useState(false);
+  const timeoutsRef = useRef<number[]>([]);
 
   const geojson = useMemo<GeoJSON.FeatureCollection<GeoJSON.Point, CommunityProperties>>(
     () => ({
@@ -168,27 +195,66 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
         container,
         style: {
           version: 8,
+          // SELF-HOSTED, KEYLESS BASEMAP.
+          //
+          // This previously used CARTO's keyless raster tiles at
+          // basemaps.cartocdn.com. CARTO changed policy and now returns a
+          // 256x256 "API KEY REQUIRED" watermark PNG for keyless requests —
+          // as HTTP 200, so nothing looked broken to a status check while
+          // the map rendered blank. The openstreetmap.org fallback was also
+          // rejected (403 tile usage policy), as was StadiaMaps (401).
+          //
+          // For a self-hostable public-good, depending on a third-party key
+          // per deployment is the wrong architecture: every municipality
+          // would need their own key and the map would break on any provider
+          // policy change. So the basemap is now:
+          //   - a flat background colour from the style spec, plus
+          //   - /ny-frame.geojson, a small state-outline polygon generated
+          //     from the municipality centroids already in our database.
+          //
+          // No external tile requests, no key, works offline. The frame is a
+          // visual spatial reference, not a survey boundary (see README).
           sources: {
-            basemap: {
-              type: "raster",
-              tiles: [
-                "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png",
-                "https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png",
-                "https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png",
-                "https://d.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png",
-              ],
-              tileSize: 256,
-              attribution:
-                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            "ny-frame": {
+              type: "geojson",
+              // INLINE, NOT A FETCH. Imported as a module rather than fetched
+              // from /ny-frame.geojson.
+              //
+              // Why: fetching the URL never worked. The source was created but
+              // stayed at loaded=false forever, no error event fired, and no
+              // network request was ever issued — so the style's "load" event
+              // never completed and the entire community layer was skipped
+              // silently. A 538-byte static polygon has no business making a
+              // network round-trip anyway: inlining removes the failure mode
+              // entirely and works offline by construction.
+              data: NY_FRAME as GeoJSON.FeatureCollection,
             },
           },
-          layers: [{ id: "basemap", type: "raster", source: "basemap" }],
+          layers: [
+            {
+              id: "background",
+              type: "background",
+              paint: { "background-color": "#f4f6f9" },
+            },
+            {
+              id: "ny-frame-fill",
+              type: "fill",
+              source: "ny-frame",
+              paint: { "fill-color": "#e6ecf4", "fill-opacity": 1 },
+            },
+            {
+              id: "ny-frame-outline",
+              type: "line",
+              source: "ny-frame",
+              paint: { "line-color": "#b9c6d6", "line-width": 1.2 },
+            },
+          ],
         },
         center: [-75.45, 42.93],
         zoom: 5.9,
         minZoom: 5,
         maxZoom: 14,
-        attributionControl: { compact: false },
+        attributionControl: false,
       });
     } catch {
       setFailed(true);
@@ -198,43 +264,99 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
     mapRef.current = map;
     map.addControl(new NavigationControl({ showCompass: false }), "top-right");
 
-    map.on("load", () => {
-      map.addSource("communities", {
-        type: "geojson",
-        data: geojson as GeoJSON.FeatureCollection,
-      });
-      map.addLayer({
-        id: "communities",
-        type: "circle",
-        source: "communities",
-        paint: {
-          "circle-radius": 6,
-          "circle-opacity": 0.92,
-          "circle-color": colorExpr("cscColor"),
-          "circle-stroke-width": 1,
-          "circle-stroke-color": "#ffffff",
-        },
-      });
-      map.on("mouseenter", "communities", () => {
-        map.getCanvas().style.cursor = "pointer";
-      });
-      map.on("mouseleave", "communities", () => {
-        map.getCanvas().style.cursor = "";
-      });
-      map.on("click", "communities", (e: MapLayerMouseEvent) => {
-        const feature = e.features?.[0];
-        if (!feature) return;
-        const props = feature.properties as CommunityProperties;
-        const geometry = feature.geometry as GeoJSON.Point;
-        new Popup({ closeButton: true, maxWidth: "300px" })
-          .setLngLat(geometry.coordinates as [number, number])
-          .setHTML(popupHtml(props))
-          .addTo(map);
-      });
-      setReady(true);
-    });
+    // Dev-only handle for the rendered-map smoke test
+    // (scripts/smoke-map.mjs). Without this, an automated check can only
+    // sample canvas pixels — it cannot assert that the source loaded or that
+    // queryRenderedFeatures() returns features. Not exposed in production.
+    if (process.env.NODE_ENV !== "production") {
+      (window as unknown as { __pathwaysMap?: MapLibreMap }).__pathwaysMap = map;
+    }
+
+    // ------------------------------------------------------------------
+    // SILENT-FAILURE GUARD (added after DEV-151 shipped a blank map as
+    // "verified"). The community layer is added inside the async "load"
+    // handler. If "load" never fires — which is what happened when the
+    // CARTO basemap started returning watermark tiles — the ENTIRE data
+    // layer is silently skipped: page returns 200, legend populates, and
+    // zero points render. There was no timeout and no error path.
+    //
+    // Two defences:
+    //   1. addLayer is attempted once the style is ready, via a race
+    //      between "load" and a short poll, so a stalled style cannot
+    //      block the data.
+    //   2. if the layer still isn't present after LOAD_TIMEOUT_MS, flip
+    //      to the visible "degraded" state instead of failing silently.
+    // ------------------------------------------------------------------
+    const LOAD_TIMEOUT_MS = 6000;
+    let settled = false;
+
+    const addCommunityLayer = () => {
+      if (settled || !map.isStyleLoaded()) return false;
+      if (map.getLayer("communities")) { settled = true; return true; }
+      try {
+        map.addSource("communities", {
+          type: "geojson",
+          data: geojson as GeoJSON.FeatureCollection,
+        });
+        map.addLayer({
+          id: "communities",
+          type: "circle",
+          source: "communities",
+          paint: {
+            "circle-radius": 6,
+            "circle-opacity": 0.92,
+            "circle-color": colorExpr("cscColor"),
+            "circle-stroke-width": 1,
+            "circle-stroke-color": "#ffffff",
+          },
+        });
+        map.on("mouseenter", "communities", () => {
+          map.getCanvas().style.cursor = "pointer";
+        });
+        map.on("mouseleave", "communities", () => {
+          map.getCanvas().style.cursor = "";
+        });
+        map.on("click", "communities", (e: MapLayerMouseEvent) => {
+          const feature = e.features?.[0];
+          if (!feature) return;
+          const props = feature.properties as CommunityProperties;
+          const geometry = feature.geometry as GeoJSON.Point;
+          new Popup({ closeButton: true, maxWidth: "300px" })
+            .setLngLat(geometry.coordinates as [number, number])
+            .setHTML(popupHtml(props))
+            .addTo(map);
+        });
+        settled = true;
+        setReady(true);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    map.on("load", addCommunityLayer);
+    // Poll as a fallback: some basemap failures leave the style loaded but
+    // the load event unhelpfully delayed or dropped.
+    const poll = window.setInterval(() => {
+      if (addCommunityLayer()) window.clearInterval(poll);
+    }, 250);
+    const deadline = window.setTimeout(() => {
+      window.clearInterval(poll);
+      if (!settled) {
+        // Data layer never attached. Say so, loudly, in the UI.
+        setDegraded(true);
+      }
+    }, LOAD_TIMEOUT_MS);
+    timeoutsRef.current.push(poll, deadline);
 
     return () => {
+      window.clearInterval(poll);
+      window.clearTimeout(deadline);
+      timeoutsRef.current.forEach((t) => {
+        window.clearTimeout(t);
+        window.clearInterval(t);
+      });
+      timeoutsRef.current = [];
       map.remove();
       mapRef.current = null;
     };
@@ -278,6 +400,23 @@ export default function StateMap({ communities }: { communities: MapCommunity[] 
 
   return (
     <div>
+      {degraded && (
+        <div
+          role="status"
+          className="mb-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+        >
+          <strong className="font-semibold">
+            Map data layer did not load.
+          </strong>{" "}
+          The map is showing but community points could not be drawn. This is
+          usually a rendering or network problem, not missing data — the
+          dataset itself is complete. Use the{" "}
+          <Link className="font-medium underline" href="/communities">
+            communities list
+          </Link>{" "}
+          for the same information.
+        </div>
+      )}
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div className="flex rounded-lg border border-neutral-300 bg-white p-1 shadow-sm">
           {(
