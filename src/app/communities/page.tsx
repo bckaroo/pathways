@@ -5,6 +5,11 @@ import { db } from "@/db";
 import { cecDesignations, municipalities } from "@/db/schema";
 import CommunityTable, { type CommunityRow } from "@/components/community-table";
 
+// Next resolves this directive STATICALLY — a computed value is rejected with
+// "Unsupported node type ConditionalExpression". The two deployment modes are
+// therefore handled by two route-directive files: this one (live) keeps
+// force-dynamic, and the export build swaps in `static-page-config` via
+// scripts/to-static-export.mjs. See docs/static-export.md.
 export const dynamic = "force-dynamic";
 
 export const metadata = {

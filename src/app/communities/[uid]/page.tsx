@@ -14,7 +14,29 @@ import {
 import ProgressionPanel from "@/components/progression-panel";
 import SectorRadial from "@/components/sector-radial";
 
+// Next resolves this directive STATICALLY — a computed value is rejected with
+// "Unsupported node type ConditionalExpression". The two deployment modes are
+// therefore handled by two route-directive files: this one (live) keeps
+// force-dynamic, and the export build swaps in `static-page-config` via
+// scripts/to-static-export.mjs. See docs/static-export.md.
 export const dynamic = "force-dynamic";
+
+// Enumerate every community for the static build so `output: export` can emit
+// one HTML file per profile. Without this the export fails on a dynamic route.
+// Returns [] in live mode (the route stays dynamic and ignores it).
+export async function generateStaticParams() {
+  if (process.env.STATIC_EXPORT !== "1") return [];
+  try {
+    const rows = await db
+      .select({ uid: municipalities.portalUid })
+      .from(municipalities);
+    return rows.map((r) => ({ uid: String(r.uid) }));
+  } catch {
+    // Let the build proceed and fail loudly on its own terms rather than
+    // reporting a confusing empty-params error.
+    return [];
+  }
+}
 
 export const metadata = {
   title: "Community profile — Pathways",

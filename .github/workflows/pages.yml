@@ -1,0 +1,131 @@
+name: Deploy static site to GitHub Pages
+
+# Builds the full app as a static export and publishes it to Pages.
+#
+# WHY THIS DOES NOT RE-SCRAPE
+# ---------------------------
+# The nine ingest scripts hit climatesmart.ny.gov, NYSERDA Tableau and Census.
+# Running them in CI would make the published site depend on a third party's
+# uptime and HTML structure, take ~3 minutes, and hammer a government portal
+# from GitHub runners. Instead we restore the committed 0.8 MB snapshot
+# (data/pathways-snapshot.sql.gz), which makes the build fast, reproducible, and
+# polite. Re-snapshot deliberately with `scripts/snapshot-db.sh dump --force`.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race for the same Pages environment.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: pathways
+          POSTGRES_PASSWORD: pathways
+          POSTGRES_DB: pathways
+        ports: ["5433:5432"]
+        options: >-
+          --health-cmd "pg_isready -U pathways"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply database schema
+        env:
+          DATABASE_URL: postgresql://pathways:pathways@localhost:5433/pathways
+        run: npm run db:migrate
+
+      - name: Restore the committed data snapshot
+        env:
+          PGPASSWORD: pathways
+        run: |
+          gunzip -c data/pathways-snapshot.sql.gz | \
+            psql -h localhost -p 5433 -U pathways -d pathways -q -v ON_ERROR_STOP=1
+
+      - name: Sanity-check the restored row counts
+        env:
+          PGPASSWORD: pathways
+        run: |
+          q() { psql -h localhost -p 5433 -U pathways -d pathways -t -A -c "$1"; }
+          # A snapshot that restores with the wrong shape would publish a
+          # plausible-looking but wrong site, so assert the shape, not just that
+          # the restore exited 0.
+          check() {
+            local got; got=$(q "SELECT COUNT(*) FROM $1")
+            if [ "$got" != "$2" ]; then
+              echo "::error::$1 has $got rows, expected $2"; exit 1
+            fi
+            echo "  ok  $1 = $got"
+          }
+          check municipalities 1024
+          check certifications 185
+          check actions 229
+          check completions 4530
+          check cec_completions 5336
+          check cec_designations 942
+          check crosswalk 35
+
+      - name: Switch routes to static rendering
+        run: node scripts/to-static-export.mjs apply
+
+      - name: Build the static export
+        env:
+          STATIC_EXPORT: "1"
+          # Project pages live at /<repo>/ — without this every _next asset 404s.
+          PAGES_BASE_PATH: /${{ github.event.repository.name }}
+          DATABASE_URL: postgresql://pathways:pathways@localhost:5433/pathways
+        run: npx next build
+
+      - name: Verify the export produced real pages
+        run: |
+          set -euo pipefail
+          pages=$(find out -name '*.html' | wc -l)
+          echo "exported HTML pages: $pages"
+          # 1,024 profiles + index + map + home + 404; fail loudly on a short export
+          # rather than silently publishing a site missing most of its content.
+          if [ "$pages" -lt 1024 ]; then
+            echo "::error::only $pages pages exported, expected at least 1024"; exit 1
+          fi
+          # Prove a known community rendered with real data.
+          f=$(find out/communities -path '*1003*' -name index.html | head -1)
+          [ -n "$f" ] || { echo "::error::New Rochelle profile missing"; exit 1; }
+          grep -q "New Rochelle" "$f"      || { echo "::error::profile has no name"; exit 1; }
+          grep -q "245" "$f"               || { echo "::error::profile has no points"; exit 1; }
+          grep -q "Emissions sectors addressed" "$f" || { echo "::error::sector radial missing"; exit 1; }
+          echo "  ok  profile content verified"
+
+      - name: Disable Jekyll
+        # Pages runs Jekyll by default, which drops directories beginning with an
+        # underscore — that would silently delete _next/ and break every asset.
+        run: touch out/.nojekyll
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+      - id: deployment
+        uses: actions/deploy-pages@v4
