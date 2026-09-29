@@ -9,8 +9,8 @@
     "lint": "eslint",
     "vendor:maplibre": "node scripts/vendor-maplibre-worker.mjs",
     "postinstall": "node scripts/vendor-maplibre-worker.mjs",
-    "smoke:map": "python3 scripts/smoke_map.py",
-    "verify:ghg": "python3 scripts/verify_ghg_sources.py",
+    "smoke:map": "bash scripts/_python.sh scripts/smoke_map.py",
+    "verify:ghg": "bash scripts/_python.sh scripts/verify_ghg_sources.py",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
@@ -21,9 +21,11 @@
     "ingest:cec:completions": "uv run --project ingest python ingest/cec_completions.py",
     "ingest:cec:crosswalk": "uv run --project ingest python ingest/cec_crosswalk.py",
     "ingest:geocode": "uv run --project ingest python ingest/geocode.py",
-    "test:fallback": "python3 scripts/test_basemap_fallback.py",
+    "test:fallback": "bash scripts/_python.sh scripts/test_basemap_fallback.py",
     "validate:csc": "tsx scripts/validate-csc-rules.mjs",
-    "verify:csc": "python3 scripts/verify_csc_actions.py"
+    "verify:csc": "bash scripts/_python.sh scripts/verify_csc_actions.py",
+    "audit:contrast": "bash scripts/_python.sh scripts/audit_contrast.py",
+    "shot:theme": "bash scripts/_python.sh scripts/shot_theme.py"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.3",
