@@ -12,6 +12,7 @@ import {
   municipalities,
 } from "@/db/schema";
 import ProgressionPanel from "@/components/progression-panel";
+import SectorRadial from "@/components/sector-radial";
 
 export const dynamic = "force-dynamic";
 
@@ -125,6 +126,23 @@ export default async function CommunityProfilePage({
       .orderBy(desc(cecCompletions.completedOn), asc(cecCompletions.rawActionName)),
   ]);
 
+  // Full CSC catalogue. Needed as the DENOMINATOR for sector coverage: without
+  // it we can only see what a community did, not what was available to do, and
+  // every sector would look either saturated or empty.
+  const cscCatalogue = await db
+    .select({
+      externalId: actions.externalId,
+      name: actions.name,
+      pointsMin: actions.pointsMin,
+      pointsMax: actions.pointsMax,
+      priority: actions.priority,
+      mandatory: actions.mandatory,
+      fundingEligible: actions.fundingEligible,
+    })
+    .from(actions)
+    .where(eq(actions.programSlug, "csc"))
+    .orderBy(asc(actions.name));
+
   const cert = certRows[0] ?? null;
   const cec = cecRowRows[0] ?? null;
   const stars = parseStars(cec?.advancedDesignation ?? null);
@@ -153,6 +171,22 @@ export default async function CommunityProfilePage({
         certifiedOn: cert.certifiedOn ?? null,
       }
     : null;
+
+  // Shape for the sector radial. Completions whose action could not be matched
+  // to the catalogue have no external id, so they cannot be assigned a sector —
+  // the radial reports that count rather than dropping them silently.
+  const sectorCatalogue = cscCatalogue.map((a) => ({
+    externalId: a.externalId,
+    name: a.name,
+    pointsMin: a.pointsMin ?? null,
+    pointsMax: a.pointsMax ?? null,
+    priority: Boolean(a.priority),
+    mandatory: Boolean(a.mandatory),
+    fundingEligible: Boolean(a.fundingEligible),
+  }));
+  const sectorCompleted = cscRows
+    .filter((r) => r.unmatched)
+    .map((r) => ({ externalId: r.unmatched as string, points: r.points ?? null }));
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
@@ -302,6 +336,13 @@ export default async function CommunityProfilePage({
           the question the raw list cannot. */}
       <div className="mb-10">
         <ProgressionPanel actions={progressionActions} cert={progressionCert} />
+      </div>
+
+      {/* Sector radial — which emitting sectors the actions actually address.
+          Placed after the path so "what unlocks next" leads, with "where the
+          effort is going" as the supporting view. */}
+      <div className="mb-10">
+        <SectorRadial catalogue={sectorCatalogue} completed={sectorCompleted} />
       </div>
 
       {/* CSC completed actions */}
