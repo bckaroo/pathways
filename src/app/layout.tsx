@@ -41,6 +41,9 @@ export default function RootLayout({
               <Link href="/communities" className="hover:text-ok-solid">
                 Communities
               </Link>
+              <Link href="/tree" className="hover:text-ok-solid">
+                Skill Tree
+              </Link>
             </nav>
           </div>
         </header>
