@@ -194,3 +194,22 @@ project **PROJ-025**). New entries go at the top.
   `certification_levels.points_required` (carried from Round 2).
 - Optional: municipal boundary polygons (choropleth), outlier cert reports
   (134, 98), GitHub remote + push when owner requests.
+
+## 2026-10-12 — Skill-tree pathway preview (DEV-277, agent:hermes)
+
+**What was built**
+- `/tree` route (static) embedding the self-contained Pathways skill-tree app in a full-height iframe, with "Open full screen" and "Back to dashboard" controls; nav link "Skill Tree" added to root layout.
+- `public/pathways/tech-tree.html` — self-contained app (~395KB, zero deps): 3-pane shell (metrics / pathway canvas / action dossier), 8 prerequisite tiers × 12 Pledge-Element lanes, gold prerequisite edges, violet chain highlight on locked actions with prerequisite list (clickable), point/category milestones to Bronze+Silver, program dropdown, JSON import/export, search filter. Program module: `public/pathways/csc-ny.json` (CSC certification v4.5, 67 actions; descriptions sourced from climatesmart.ny.gov via browser AJAX).
+- Production build passes (lint + build, /tree static ○ 118 kB).
+
+**Ops note — port conflict**
+- AGENTS.md pins dev port 3005, but it is currently occupied by PROJ-033 (APA NYM TechComm) `next dev`. Preview is served at **127.0.0.1:3006** (`next start -p 3006`, temp session) — not registered, per policy a persistent Pathways port should be decided by Andrew (apps range 3110+ or a dedicated dev port) and logged in ports.json.
+
+**Verification**
+- lint clean; build 6/6 routes green incl. `/tree`.
+- HTTP 200: `/tree`, `/pathways/tech-tree.html`, `/pathways/csc-ny.json`; frame renders (nav + iframe 1280×473 confirmed via CDP).
+- Earlier app-level browser tests: level eval (SILVER at full completion), prereq chains, import/export roundtrip, state isolation per program.
+
+**Follow-ups**
+- Register a persistent Pathways port in `~/.openclaw/config/ports.json`; resolve the 3005 double-claim with PROJ-033.
+- Wire csc-ny.json into the Drizzle DB (actions table) so the tree reads live data; add GitHub Pages export of the static tree.
