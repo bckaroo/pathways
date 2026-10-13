@@ -41,6 +41,22 @@
   .metric{display:flex;justify-content:space-between;align-items:baseline;background:#151b26;border:1px solid #2c333d;border-radius:6px;padding:7px 12px;font-family:Verdana,sans-serif}
   .metric .v{color:var(--gold-bright);font-size:15px}
   .metric .k{color:var(--silver);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase}
+  .impact-summary{border:1px solid rgba(95,174,79,.45);border-radius:8px;background:rgba(95,174,79,.08);padding:11px}
+  .impact-summary .value{font-size:20px;color:#9bdd8d;margin:3px 0}
+  .impact-summary p,.impact-disclosure{font:9.5px/1.45 Verdana,sans-serif;color:#9fb0c3}
+  #trajectory{margin-top:9px}
+  #trajectory svg{display:block;width:100%}
+  #trajectory .legend{display:flex;flex-wrap:wrap;gap:7px;margin-top:5px;font:8.5px Verdana,sans-serif;color:#9fb0c3}
+  #trajectory .legend i{display:inline-block;width:14px;height:2px;margin-right:3px;vertical-align:middle}
+  #traj-inputs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px}
+  #traj-inputs label{font:8.5px/1.3 Verdana,sans-serif;color:var(--silver);text-transform:uppercase;letter-spacing:.05em}
+  #traj-inputs input{width:100%;margin-top:3px;padding:5px;background:#10151d;color:var(--cream);border:1px solid #4a5665;border-radius:4px;font:11px Verdana,sans-serif}
+  #trajectory details summary{cursor:pointer;font:9px Verdana,sans-serif;color:var(--gold);margin-top:6px;user-select:none}
+  .impact-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:9px 0}
+  .impact-grid label{font:9px/1.35 Verdana,sans-serif;color:var(--silver);text-transform:uppercase;letter-spacing:.06em}
+  .impact-grid input{width:100%;margin-top:4px;padding:7px;background:#10151d;color:var(--cream);border:1px solid #4a5665;border-radius:5px;font:12px Verdana,sans-serif}
+  .impact-result{padding:9px;border-left:3px solid var(--green);background:rgba(95,174,79,.08);font:11px/1.5 Verdana,sans-serif;color:#d8e8d4}
+  .impact-kind{display:inline-block;margin-bottom:7px;padding:3px 6px;border-radius:4px;background:#28313d;color:#cbd4df;font:9px Verdana,sans-serif;text-transform:uppercase;letter-spacing:.08em}
   .sec-h{color:var(--gold-bright);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;font-family:Verdana,sans-serif;margin:6px 0 7px}
   .bar-row .lbl{display:flex;justify-content:space-between;font-family:Verdana,sans-serif;font-size:9.5px;color:var(--silver);margin-bottom:3px}
   .track{height:6px;background:#20242b;border-radius:4px;overflow:hidden}
@@ -51,6 +67,10 @@
   /* ════ CENTER ════ */
   #center{flex:1;overflow:auto;height:100%;position:relative;cursor:grab;touch-action:none}
   #center.panning,#center.panning .card{cursor:grabbing;user-select:none}
+  #zoom-ctl{position:absolute;bottom:12px;left:12px;z-index:30;display:flex;gap:5px;align-items:center;padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:rgba(16,21,29,.95);font:10px Verdana,sans-serif;color:var(--cream);user-select:none}
+  #zoom-ctl button{width:26px;height:24px;padding:0;background:#1c222c;border:1px solid #3a4552;border-radius:5px;color:var(--cream);font:13px/1 Verdana,sans-serif;cursor:pointer}
+  #zoom-ctl button:hover{border-color:var(--gold)}
+  #zoom-ctl .zval{min-width:38px;text-align:center}
   #tree-wrap{position:relative;margin:0 auto 60px auto;isolation:isolate}
   #phase-grid,#group-layer{position:absolute;inset:0;pointer-events:none}
   #phase-grid{z-index:0}
@@ -63,7 +83,10 @@
   .lane-label{position:sticky;left:12px;top:8px;display:inline-block;max-width:205px;padding:5px 8px;border-radius:5px;background:#171d27;border:1px solid rgba(201,169,89,.23);font-family:Verdana,sans-serif;font-size:9.5px;color:var(--gold-bright);letter-spacing:.1em;text-transform:uppercase;z-index:2}
   .subgroup{position:absolute;left:12px;right:12px;border-top:1px solid rgba(154,164,176,.18);background:linear-gradient(90deg,rgba(154,164,176,.04),transparent 34%)}
   .subgroup-label{position:sticky;left:20px;top:8px;display:inline-block;max-width:190px;padding:4px 7px;border-radius:4px;background:#202733;border-left:2px solid var(--gold);color:#c8d0d9;font-family:Verdana,sans-serif;font-size:9px;letter-spacing:.08em;text-transform:uppercase;z-index:2}
-  .card{position:absolute;width:220px;min-height:112px;background:var(--panel-dark);border:1px solid #4a4234;border-radius:6px;padding:9px 10px 9px;cursor:pointer;transition:box-shadow .15s, opacity .2s;will-change:transform;z-index:4}
+  .card{position:absolute;width:220px;min-height:132px;background:var(--panel-dark);border:1px solid #4a4234;border-radius:6px;padding:9px 10px 9px;cursor:pointer;transition:box-shadow .15s, opacity .2s;will-change:transform;z-index:4}
+  .card .meta{flex-wrap:wrap;column-gap:5px;row-gap:5px}
+  .impact-badge{font:9px Verdana,sans-serif;color:var(--gold-bright);white-space:nowrap}
+  .completion-year{margin-top:6px;font:9px Verdana,sans-serif;color:var(--silver)}
   .card.dim{opacity:.15;pointer-events:none}
   .card.available{border-color:var(--gold)}
   .card.available .icon{border-color:var(--gold)}
@@ -145,6 +168,27 @@
     <div class="metric"><span class="k">Points</span><span class="v" id="m-pts">0</span><span class="k" style="margin-left:6px;letter-spacing:0" id="m-pts-target"></span></div>
     <div class="metric"><span class="k">Category coverage</span><span class="v" id="m-pe"></span><span class="k" style="margin-left:6px;letter-spacing:0" id="m-pe-target"></span></div>
     <div class="metric"><span class="k">Available now</span><span class="v" id="m-avail"></span></div>
+    <div class="impact-summary">
+      <div class="sec-h">Illustrative annual impact</div>
+      <div class="value" id="m-ghg">~0 t CO₂e/yr</div>
+      <p id="m-ghg-note">Direct actions only; overlap-adjusted.</p>
+      <p class="impact-disclosure">Planning illustration only — not an emissions inventory or a DEC-approved accounting method.</p>
+      <div id="trajectory" aria-label="Illustrative emissions trajectory: business as usual, with your actions, and target path.">
+        <svg id="traj-svg" viewBox="0 0 248 130" role="img"></svg>
+        <div class="legend"><span><i style="background:#8a93a3"></i>Business as usual</span><span><i style="background:#9bdd8d"></i>With your actions</span><span><i style="background:#e8915f"></i>Target path</span></div>
+        <p id="traj-summary" style="margin-top:5px"></p>
+        <details><summary>Scenario assumptions (editable)</summary>
+          <div id="traj-inputs">
+            <label>Baseline t CO₂e/yr<input id="traj-base" type="number" min="0" step="100"></label>
+            <label>Baseline year<input id="traj-year" type="number" min="1900" max="2100"></label>
+            <label>Annual growth %<input id="traj-growth" type="number" step="0.1"></label>
+            <label>Target year<input id="traj-tyear" type="number" min="1900" max="2100"></label>
+            <label>Target reduction %<input id="traj-tred" type="number" min="0" max="100" step="1"></label>
+          </div>
+          <p class="impact-disclosure" id="traj-source-line"></p>
+        </details>
+      </div>
+    </div>
     <div><div class="sec-h">Next milestones</div><div id="milestones"></div></div>
     <section style="border-top:1px solid var(--line-dim);padding-top:10px;margin-top:2px">
       <div class="sec-h" id="pe-sech">Actions by category</div>
@@ -159,6 +203,9 @@
       <div id="group-layer"></div>
       <svg id="edges"></svg>
       <div id="cards"></div>
+    </div>
+    <div id="zoom-ctl" title="Ctrl+scroll wheel (or trackpad pinch), +/− keys, or these buttons. Shift+0 resets to 100%.">
+      <button id="z-out" aria-label="Zoom out">−</button><span class="zval" id="z-val">100%</span><button id="z-in" aria-label="Zoom in">+</button>
     </div>
   </div>
 
@@ -184,6 +231,8 @@
   <li><b>Left pane</b> tracks your progress: points, milestones, and per-category coverage as you build the pathway.</li>
   <li><b>Center canvas</b> is the tree: actions grouped into horizontal lanes by the program's categories, positioned in prerequisite-order columns, with gold connector lines.</li>
   <li><b>Right pane</b> is the action dossier: overview, point rules, submission requirements, funding co-benefits. Locked actions list exactly which prerequisites are missing — click a prerequisite to navigate to it — and the full chain is highlighted in violet on the canvas.</li>
+  <li><b>GHG impact is illustrative.</b> A direct action can carry its own editable maximum annual impact assumption. Pathways prorates that amount by credited points divided by the action's maximum points, clamped from 0% to 100%. No universal point-to-ton conversion is used. Enabling and adaptation actions are not directly quantified, and overlap groups count only their largest estimate.</li>
+  <p><b>Methodology disclosure:</b> These estimates are for concept planning only. They are not an emissions inventory, a forecast, a claim of achieved reductions, or a DEC-approved accounting method. Replace the rounded defaults with locally supported estimates before using them in planning.</p>
   <h2 style="margin-top:18px">Adding a program (other states, cities)</h2>
   <p>A program module is just JSON conforming to the schema below — no code. Use <code>＋ Import program</code> to load one, then switch programs from the dropdown in the top bar.</p>
   <pre>PROGRAM = {
@@ -209,7 +258,12 @@
       "why": "short hook for the card",
       "details": [ {"title": "...", "points_how": "...", "submit": "...", "timeframe": "...", "recert": "..."} ],
       "lookback": "10 years",        // optional retroactive credit window
-      "cobenefits": ["...]           // optional funding / program synergies
+      "cobenefits": ["..."],          // optional funding / program synergies
+      "impact": {                     // optional, explicit per-action assumption
+        "kind": "direct",             // direct | enabling | adaptation
+        "max_annual_mtco2e": 500,
+        "overlap_group": "municipal-fleet"
+      }
   }]
 }</pre>
   <p>Actions, levels, categories and milestones are all arbitrary per program — a city's incentive checklist or a state adaptation program uses the same engine, its own lanes and its own point scheme.</p>
@@ -2169,7 +2223,7 @@ const PathwaysLayout = (() => {
     return { key: slug(label), label, source: found ? 'content' : 'fallback' };
   }
   function buildLayout(program) {
-    const CARD_WIDTH = 220, CARD_HEIGHT = 112, STACK_GAP = 14;
+    const CARD_WIDTH = 220, CARD_HEIGHT = 132, STACK_GAP = 14;
     const LABEL_WIDTH = 236, PHASE_SLOT_WIDTH = 238, PHASE_SLOTS = 3;
     const PHASE_WIDTH = PHASE_SLOT_WIDTH * PHASE_SLOTS;
     const TOP = 84, LANE_HEADER = 40, GROUP_HEADER = 30, GROUP_BOTTOM = 12, LANE_GAP = 18;
@@ -2246,24 +2300,162 @@ const PathwaysLayout = (() => {
 if (typeof module !== 'undefined') module.exports = PathwaysLayout;
 /* TREE_LAYOUT_END */
 
+/* GHG_MODEL_START */
+const PathwaysGHG = (() => {
+  function parseMaxPoints(value) {
+    if (typeof value === 'number' && Number.isFinite(value)) return Math.max(0, value);
+    const values = String(value ?? '').match(/\d+(?:\.\d+)?/g);
+    return values ? Math.max(...values.map(Number).filter(Number.isFinite)) : 0;
+  }
+  function modeledImpact(maxAnnual, creditedPoints, maxPoints) {
+    const max = Math.max(0, Number(maxAnnual) || 0);
+    const points = Math.max(0, Number(creditedPoints) || 0);
+    const denominator = Math.max(0, Number(maxPoints) || 0);
+    if (!max || !denominator) return 0;
+    return max * Math.min(1, points / denominator);
+  }
+  function actionImpact(action, settings = {}) {
+    const impact = action.impact || { kind: 'enabling' };
+    const kind = ['direct', 'enabling', 'adaptation'].includes(impact.kind) ? impact.kind : 'enabling';
+    const maxPoints = parseMaxPoints(action.points);
+    const creditedPoints = Math.max(0, Number(settings.creditedPoints) || 0);
+    const maxAnnual = Math.max(0, Number(settings.maxAnnual ?? impact.max_annual_mtco2e) || 0);
+    return {
+      kind,
+      maxPoints,
+      creditedPoints,
+      maxAnnual,
+      modeledAnnual: kind === 'direct' ? modeledImpact(maxAnnual, creditedPoints, maxPoints) : 0,
+      overlapGroup: impact.overlap_group || null,
+    };
+  }
+  function aggregateImpacts(actions, settingsById = {}) {
+    const rows = actions.map(action => actionImpact(action, settingsById[action.id] || {}));
+    const direct = rows.filter(row => row.kind === 'direct' && row.maxAnnual > 0);
+    const groups = new Map();
+    let ungrouped = 0;
+    direct.forEach(row => {
+      if (!row.overlapGroup) ungrouped += row.modeledAnnual;
+      else groups.set(row.overlapGroup, Math.max(groups.get(row.overlapGroup) || 0, row.modeledAnnual));
+    });
+    const totalAnnual = ungrouped + [...groups.values()].reduce((sum, value) => sum + value, 0);
+    const unadjustedAnnual = direct.reduce((sum, row) => sum + row.modeledAnnual, 0);
+    return {
+      totalAnnual,
+      unadjustedAnnual,
+      overlapAvoided: Math.max(0, unadjustedAnnual - totalAnnual),
+      quantifiedActions: direct.length,
+    };
+  }
+  function normalizeScenario(raw = {}) {
+    const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,Number(v)||0));
+    const year=clamp(raw.baselineYear,1900,2100)||2019;
+    const out={
+      baselineAnnual: clamp(raw.baselineAnnual,0,Infinity),
+      baselineYear: year,
+      bauGrowthPct: clamp(raw.bauGrowthPct,-100,200),
+      targetYear: clamp(raw.targetYear,1900,2100)||year+11,
+      targetReductionPct: clamp(raw.targetReductionPct,0,100),
+    };
+    if(out.targetYear<out.baselineYear) out.targetYear=out.baselineYear;
+    return out;
+  }
+  function buildTrajectory(actions, settingsById, yearsById, rawOpts = {}) {
+    const opts=normalizeScenario(rawOpts);
+    const baselineYear=opts.baselineYear, baselineEmissions=opts.baselineAnnual, bauGrowthPct=opts.bauGrowthPct, targetYear=opts.targetYear, targetReductionPct=opts.targetReductionPct;
+    const finalYear=Math.max(opts.targetYear,baselineYear+1,...Object.values(yearsById||{}).map(Number).filter(Number.isFinite));
+    const savings = new Map(); // key -> {earliest, entries:[{annual, year}]}
+    actions.forEach(action => {
+      const row = actionImpact(action, (settingsById || {})[action.id] || {});
+      if (row.kind !== 'direct' || row.maxAnnual <= 0) return;
+      const year = Number((yearsById || {})[action.id]);
+      if (!Number.isFinite(year)) return;
+      const key = row.overlapGroup || ungroupedKey(action.id);
+      const entry = savings.get(key);
+      if (!entry) savings.set(key, { earliest: year, entries: [{ annual: row.modeledAnnual, year }] });
+      else { entry.earliest = Math.min(entry.earliest, year); entry.entries.push({ annual: row.modeledAnnual, year }); }
+    });
+    const totalSavings = [...savings.values()].reduce((sum, v) => sum + Math.max(...v.entries.map(e=>e.annual)), 0);
+    const series = [];
+    for (let year = baselineYear; year <= finalYear; year++) {
+      const bau = baselineEmissions * Math.pow(1 + bauGrowthPct / 100, year - baselineYear);
+      const target = Math.max(0, baselineEmissions * (1 - (targetReductionPct / 100) * (year - baselineYear) / ((targetYear - baselineYear) || 1)));
+      let adopted = 0;
+      savings.forEach(({ entries }) => {
+        const active = entries.filter(e => year >= e.year);
+        if (active.length) adopted += Math.max(...active.map(e => e.annual));
+      });
+      series.push({ year, bau: Math.round(bau*1e6)/1e6, adjusted: Math.max(0, Math.round((bau - adopted)*1e6)/1e6), target: Math.round(target*1e6)/1e6, annualSavings: adopted });
+    }
+    const targetMetYear = (series.find(p => p.annualSavings > 0 && p.year > baselineYear && p.adjusted <= p.target) || {}).year || null;
+    series.targetMetYear = targetMetYear;
+    series.scenario = opts;
+    series.totalSavings = totalSavings;
+    return series;
+  }
+
+  function ungroupedKey(actionId) { return 'action-' + actionId; }
+  return { aggregateImpacts, actionImpact, modeledImpact, parseMaxPoints, buildTrajectory, normalizeScenario };
+})();
+if (typeof module !== 'undefined') module.exports = PathwaysGHG;
+/* GHG_MODEL_END */
+
+// Rounded concept defaults for CSC only. Each amount belongs to an action; CSC
+// points are used only to prorate that action's amount, never as a tons factor.
+const CSC_DIRECT_IMPACT = {
+  13:[100,'municipal-buildings'], 14:[300,'municipal-buildings'], 16:[200,'municipal-buildings'],
+  22:[100,'municipal-fleet'], 23:[500,'municipal-fleet'], 26:[200,'street-lighting'],
+  44:[500,'municipal-electricity'], 48:[500,'municipal-buildings'], 49:[1000,'municipal-electricity'],
+  50:[1000,'community-electricity'], 62:[100,'community-organics'], 63:[500,'community-organics'],
+  75:[500,'community-transportation'], 132:[1000,'municipal-buildings'], 133:[500,'municipal-fleet'],
+  134:[1000,'municipal-electricity'], 150:[5000,'community-electricity'], 152:[1000,'community-electricity'],
+  165:[500,'refrigerants']
+};
+const CSC_ADAPTATION_ACTIONS = new Set([82,85,87,88,91,97,99,100,103,104,105]);
+function applyImpactDefaults(program){
+  const isCSC=['csc-ny','csc-tree'].includes(program.id);
+  program.actions.forEach(action=>{
+    if(action.impact) return;
+    const direct=isCSC&&CSC_DIRECT_IMPACT[action.id];
+    if(direct){
+      action.impact={kind:'direct',max_annual_mtco2e:direct[0],overlap_group:direct[1],assumption:'Rounded illustrative local scenario; replace with locally supported project or inventory data.'};
+    }else if(isCSC&&CSC_ADAPTATION_ACTIONS.has(action.id)){
+      action.impact={kind:'adaptation',assumption:'This action primarily reduces climate risk, so no direct annual GHG amount is assigned.'};
+    }else{
+      action.impact={kind:'enabling',assumption:'This action enables, plans, measures, or supports reductions that should be attributed to implemented projects instead.'};
+    }
+  });
+}
+
 const store = {
   all(){ try{return Object.assign({[BUILTIN.id]:BUILTIN}, JSON.parse(localStorage.getItem('pathways-programs')||'{}'))}catch(e){return {[BUILTIN.id]:BUILTIN}} },
   saveCustom(list){ localStorage.setItem('pathways-programs', JSON.stringify(list)) },
   custom(){ try{return JSON.parse(localStorage.getItem('pathways-programs')||'{}')}catch(e){return {}} }
 };
-let PROGRAM=null, state={}, programId=null;
-const est = p => { const m=(""+p).match(/(\d+)[\s-]*$|(\d+)/); return m ? Math.min(20, parseInt(m[0])) : 8 };
+let PROGRAM=null, state={}, impactState={}, completionYears={}, programId=null;
+const svgTraj=document.getElementById('traj-svg');
+const SCENARIO_DEFAULTS = { baselineAnnual: 74615, baselineYear: 2019, bauGrowthPct: 2, targetYear: 2035, targetReductionPct: 50 };
+const SCENARIO_SOURCE = 'Baseline: Village of Sleepy Hollow 2019 community-wide inventory, 74,615 t CO₂e (sustainablesleepyhollow.org, Dec 2022). Growth, target, and action impacts are illustrative.';
+let scenario = {};
+const est = PathwaysGHG.parseMaxPoints;
 
 function loadProgram(pid){
   const all = store.all();
   PROGraph = PROGRAM = all[pid]; programId = pid;
   if(!PROGRAM) return;
+  applyImpactDefaults(PROGRAM);
   localStorage.setItem('pathways-current', pid);
   state = JSON.parse(localStorage.getItem('pw-state-'+pid) || JSON.stringify({}));
+  impactState = JSON.parse(localStorage.getItem('pw-impact-'+pid) || JSON.stringify({}));
+  completionYears = JSON.parse(localStorage.getItem('pw-years-'+pid) || JSON.stringify({}));
+  scenario = Object.assign({}, SCENARIO_DEFAULTS, JSON.parse(localStorage.getItem('pw-scenario-'+pid) || '{}'));
   // migrate: any action id keyed truthy not in program -> drop
   const valid = new Set(PROGRAM.actions.map(a=>a.id));
   Object.keys(state).forEach(k=>{ if(!valid.has(+k)) delete state[+k]; });
-  buildTree(); refresh(); hud();
+  Object.keys(impactState).forEach(k=>{ if(!valid.has(+k)) delete impactState[+k]; });
+  Object.keys(completionYears).forEach(k=>{ if(!valid.has(+k)) delete completionYears[+k]; });
+  renderScenarioInputs();
+  buildTree(); refresh(); hud(); applyZoom();
   document.getElementById('pg-title').textContent = PROGRAM.name;
   document.getElementById('pg-sub').textContent = PROGRAM.jurisdiction + (PROGRAM.source_url?` · ${PROGRAM.source_url.replace('https://','')}`:'');
   document.title = 'Pathways — ' + PROGRAM.name;
@@ -2311,7 +2503,7 @@ function buildTree(){
     d.style.left=p.x+'px';d.style.top=p.y+'px';
     const tags=(a.tags||[]).map(tg=>`<span class="tag ${tg.toLowerCase()}">${tg}</span>`).join('');
     d.innerHTML=`<div class="check">✔</div><div class="top"><div class="icon">${a.icon||'📄'}</div><h3>${a.name}</h3></div>
-      <div class="meta"><span class="pts">${a.points} pts</span><span class="pe">${a.category}</span></div>${tags?`<div class="tags">${tags}</div>`:''}`;
+      <div class="meta"><span class="pts">${a.points} pts</span><span class="impact-badge"></span><span class="pe">${a.category}</span></div>${tags?`<div class="tags">${tags}</div>`:''}<div class="completion-year"></div>`;
     d.onclick=()=>{if(!suppressCardClick)openPanel(a.id)};
     cardEls[a.id]=d;document.getElementById('cards').appendChild(d);
   });
@@ -2339,6 +2531,16 @@ function refresh(chainIds, focusId){
   svg.innerHTML=h;
   PROGRAM.actions.forEach(a=>{
     const el=cardEls[a.id],un=isUnlocked(a),done=!!state[a.id];
+    const badge=el.querySelector('.impact-badge');
+    el.querySelector('.completion-year').textContent=`Year completed: ${completionYears[a.id]||'—'}`;
+    if(a.impact.kind==='direct'){
+      const impact=PathwaysGHG.actionImpact(a,impactSettingsFor(a));
+      badge.textContent=`~${formatImpact(impact.modeledAnnual)}/${formatImpact(impact.maxAnnual)} GHG Impact`;
+      badge.title='Concept-only modeled / maximum annual impact (t CO₂e/yr); not inventory emissions or DEC-approved.';
+    }else{
+      badge.textContent='— GHG Impact';
+      badge.title='No direct GHG estimate for this enabling or adaptation action.';
+    }
     el.classList.toggle('done',done);
     el.classList.toggle('available',un&&!done);
     el.classList.toggle('locked',!un&&!done);
@@ -2351,9 +2553,59 @@ function refresh(chainIds, focusId){
   hud();
 }
 
+function impactSettingsFor(action){
+  const saved=impactState[action.id]||{};
+  return {
+    creditedPoints:saved.creditedPoints!==undefined?saved.creditedPoints:(state[action.id]?est(action.points):0),
+    maxAnnual:saved.maxAnnual!==undefined?saved.maxAnnual:action.impact.max_annual_mtco2e
+  };
+}
+function creditedPointsFor(action){return impactSettingsFor(action).creditedPoints}
+function formatImpact(value){return Math.round(Math.max(0,value||0)).toLocaleString('en-US')}
+
+function renderScenarioInputs(){
+  [['traj-base','baselineAnnual'],['traj-year','baselineYear'],['traj-growth','bauGrowthPct'],['traj-tyear','targetYear'],['traj-tred','targetReductionPct']].forEach(([id,key])=>{
+    const input=document.getElementById(id); if(input) input.value=scenario[key];
+  });
+}
+function bindScenarioInputs(){
+  [['traj-base','baselineAnnual'],['traj-year','baselineYear'],['traj-growth','bauGrowthPct'],['traj-tyear','targetYear'],['traj-tred','targetReductionPct']].forEach(([id,key])=>{
+    document.getElementById(id).addEventListener('change',e=>{
+      const v=Number(e.target.value);
+      if(!Number.isFinite(v)){e.target.value=scenario[key];return}
+      scenario[key]=v;
+      localStorage.setItem('pw-scenario-'+programId,JSON.stringify(scenario));
+      hud();
+    });
+  });
+}
+
+function drawTrajectory(){
+  if(!PROGRAM) return;
+  const t=PathwaysGHG.buildTrajectory(PROGRAM.actions,Object.fromEntries(PROGRAM.actions.map(a=>[a.id,impactSettingsFor(a)])),completionYears,scenario);
+  document.getElementById('traj-source-line').textContent=SCENARIO_SOURCE;
+  const W=248,H=130,pad={l:30,r:6,t:8,b:16};
+  const years=t.map(p=>p.year);
+  const maxV=Math.max(...t.map(p=>p.bau),1);
+  const xYear=year=>pad.l+(year-years[0])/((years.at(-1)-years[0])||1)*(W-pad.l-pad.r);
+  const yLine=v=>(H-pad.b)-(Math.max(0,v)/maxV)*(H-pad.t-pad.b);
+  const path=key=>t.map((p,i)=>(i?'L':'M')+xYear(p.year).toFixed(1)+','+yLine(p[key]).toFixed(1)).join('');
+  let g=`<line x1="${pad.l}" y1="${H-pad.b}" x2="${W-pad.r}" y2="${H-pad.b}" stroke="#3a4048"/>`;
+  [0,.5,1].forEach(f=>{const yy=yLine(maxV*f);g+=`<line x1="${pad.l}" y1="${yy}" x2="${W-pad.r}" y2="${yy}" stroke="#232a34" stroke-width=".5"/><text x="${pad.l-3}" y="${yy+7}" font-size="6" fill="#6b7684" text-anchor="end" font-family="Verdana">${f===0?'0':(maxV*f/1000).toFixed(0)+'k'}</text>`});
+  [years[0],Math.round((years[0]+years.at(-1))/2),years.at(-1)].forEach(yr=>{g+=`<text x="${xYear(yr)}" y="${H-4}" font-size="6.5" fill="#6b7684" text-anchor="middle" font-family="Verdana">${yr}</text>`});
+  g+=`<path d="${path('bau')}" fill="none" stroke="#8a93a3" stroke-width="1.5"/>`;
+  g+=`<path d="${path('target')}" fill="none" stroke="#e8915f" stroke-width="1.2" stroke-dasharray="3 2"/>`;
+  g+=`<path d="${path('adjusted')}" fill="none" stroke="#9bdd8d" stroke-width="2"/>`;
+  svgTraj.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  svgTraj.innerHTML=g;
+  const last=t.at(-1), lastTarget=t.find(pt=>pt.year===(scenario.targetYear||2019))||last;
+  const met=last && last.adjusted<=last.target;
+  document.getElementById('traj-summary').innerHTML=`By ${lastTarget.year}: BAU ~<b>${formatImpact(last.bau)}</b> vs with actions ~<b>${formatImpact(last.adjusted)}</b> vs target ~<b>${formatImpact(last.target)}</b> t CO₂e/yr.`+(met?` On or below the target path from <b>${t.targetMetYear}</b>.`:` Dated actions do not reach the target path by ${lastTarget.year} in this scenario.`);
+}
+
 function hud(){
   const P=PROGRAM;
-  let pts=0; P.actions.forEach(a=>{if(state[a.id])pts+=est(a.points)});
+  let pts=0; P.actions.forEach(a=>{pts+=creditedPointsFor(a)});
   const nDone=P.actions.filter(a=>state[a.id]).length;
   const cats=new Set(P.actions.filter(a=>state[a.id]).map(a=>a.category));
   const req=(P.required_actions||[]).every(id=>state[id]);
@@ -2368,11 +2620,18 @@ function hud(){
   });
   document.getElementById('m-level').textContent=level.name.toUpperCase();
   document.getElementById('m-done').textContent=nDone+'/'+P.actions.length;
-  document.getElementById('m-pts').textContent=Math.round(pts);
+  document.getElementById('m-pts').textContent=Number.isInteger(pts)?pts:Math.round(pts*10)/10;
   document.getElementById('m-pts-target').textContent='/ '+P.point_ceiling+' to '+((P.levels||[]).slice(-1)[0]||{name:'top level'}).name;
   document.getElementById('m-pe').textContent=cats.size;
   document.getElementById('m-pe-target').textContent='B:'+((P.levels||[])[1]||{}).min_categories+' · S:'+((P.levels||[])[2]||{}).min_categories;
   document.getElementById('m-avail').textContent=P.actions.filter(a=>isUnlocked(a)&&!state[a.id]).length;
+  const impactSettings=Object.fromEntries(P.actions.map(a=>[a.id,impactSettingsFor(a)]));
+  const portfolio=PathwaysGHG.aggregateImpacts(P.actions,impactSettings);
+  document.getElementById('m-ghg').textContent=`~${formatImpact(portfolio.totalAnnual)} t CO₂e/yr`;
+  document.getElementById('m-ghg-note').textContent=portfolio.overlapAvoided>0
+    ? `${portfolio.quantifiedActions} direct assumptions; ~${formatImpact(portfolio.overlapAvoided)} t/yr of overlap not added twice.`
+    : `${portfolio.quantifiedActions} direct assumptions; enabling and adaptation actions are not quantified.`;
+  drawTrajectory();
   // milestone bars per level
   const ms=[];
   (P.levels||[]).filter(l=>l.name!=='Registered').forEach(l=>{
@@ -2398,6 +2657,45 @@ const right=document.getElementById('right'), pBody=document.getElementById('p-b
 let currentId=null;
 const esc=s=>((s||'')+'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const section=(t,h)=>h?`<section><h5>${t}</h5>${h}</section>`:'';
+function impactSection(action){
+  const impact=PathwaysGHG.actionImpact(action,impactSettingsFor(action));
+  const label=impact.kind==='direct'?'Direct impact assumption':impact.kind==='adaptation'?'Adaptation action':'Enabling action';
+  const disclosure='<p class="impact-disclosure" style="margin-top:8px">Concept planning only: not an emissions inventory, forecast, achieved reduction, or DEC-approved accounting method. No universal point-to-ton factor is used.</p>';
+  if(impact.kind!=='direct'){
+    return section('Illustrative GHG impact',`<span class="impact-kind">${label}</span><p><b>No direct quantified impact.</b> ${esc(action.impact.assumption)}</p>${disclosure}`);
+  }
+  const overlap=impact.overlapGroup?`<p style="margin-top:7px"><b>Overlap group:</b> ${esc(impact.overlapGroup)}. The left-pane total counts only the largest modeled estimate in this group.</p>`:'';
+  return section('Illustrative GHG impact',`<span class="impact-kind">${label}</span><p>${esc(action.impact.assumption)}</p>
+    <div class="impact-grid">
+      <label>Credited CSC points<input id="impact-points" type="number" min="0" max="${impact.maxPoints}" step="0.5" value="${impact.creditedPoints}"></label>
+      <label>Max annual assumption<input id="impact-max" type="number" min="0" step="10" value="${impact.maxAnnual}"></label>
+    </div>
+    <div class="impact-result">Modeled action impact: <b id="impact-modeled">~${formatImpact(impact.modeledAnnual)} t CO₂e/yr</b><br><span id="impact-formula">${impact.creditedPoints} ÷ ${impact.maxPoints} points × ${formatImpact(impact.maxAnnual)} t/yr</span></div>
+    ${overlap}${disclosure}`);
+}
+function renderImpactResult(action){
+  const modeled=document.getElementById('impact-modeled'), formula=document.getElementById('impact-formula');
+  if(!modeled||!formula) return;
+  const impact=PathwaysGHG.actionImpact(action,impactSettingsFor(action));
+  modeled.textContent=`~${formatImpact(impact.modeledAnnual)} t CO₂e/yr`;
+  formula.textContent=`${impact.creditedPoints} ÷ ${impact.maxPoints} points × ${formatImpact(impact.maxAnnual)} t/yr`;
+}
+function bindImpactInputs(action){
+  const points=document.getElementById('impact-points'), max=document.getElementById('impact-max');
+  if(!points||!max) return;
+  const save=()=>{
+    const maxPoints=est(action.points);
+    impactState[action.id]={
+      creditedPoints:Math.min(maxPoints,Math.max(0,Number(points.value)||0)),
+      maxAnnual:Math.max(0,Number(max.value)||0)
+    };
+    points.value=impactState[action.id].creditedPoints;
+    max.value=impactState[action.id].maxAnnual;
+    localStorage.setItem('pw-impact-'+programId,JSON.stringify(impactState));
+    hud();renderImpactResult(action);
+  };
+  points.addEventListener('change',save);max.addEventListener('change',save);
+}
 function openPanel(id){
   currentId=id;
   const a=byId(id);
@@ -2430,7 +2728,18 @@ function openPanel(id){
   });
   if(a.lookback) body+=section('Retroactive credit window',`<p>Work completed up to <b>${esc(a.lookback)}</b> before the application date can still earn points for this action.</p>`);
   if((a.cobenefits||[]).length) body+=section('Co-benefit grants &amp; program synergies',`<ul>${a.cobenefits.map(c=>`<li>${esc(c)}</li>`).join('')}</ul>`);
+  body+=impactSection(a);
+  body+=section('Year completed',`<label for="completion-year-input">Calendar year (leave blank if unknown)</label><input id="completion-year-input" type="number" min="1900" max="2100" step="1" value="${completionYears[id]||''}" style="display:block;margin-top:6px;width:110px" aria-label="Year completed for ${esc(a.name)}">`);
   pBody.innerHTML=body;
+  bindImpactInputs(a);
+  document.getElementById('completion-year-input').addEventListener('change',e=>{
+    const value=e.target.value.trim();
+    const year=Number(value);
+    if(value && (!Number.isInteger(year)||year<1900||year>2100)){e.target.value=completionYears[id]||'';return}
+    if(value)completionYears[id]=year;else delete completionYears[id];
+    localStorage.setItem('pw-years-'+programId,JSON.stringify(completionYears));
+    refresh(chain,id);
+  });
   if(!un&&!state[id]){pBtn.style.display='none'}else{pBtn.style.display='block';setBtn(a)}
   right.classList.add('open');
   refresh(chain, id);
@@ -2440,9 +2749,9 @@ function setBtn(a){
   pBtn.textContent=state[a.id]?'✓ Completed — click to undo':'Mark this action completed';
   pBtn.classList.toggle('done',!!state[a.id]);
 }
-pBtn.onclick=()=>{if(currentId!=null){state[currentId]=!state[currentId];localStorage.setItem('pw-state-'+programId,JSON.stringify(state));refresh();setBtn(byId(currentId))}};
+pBtn.onclick=()=>{if(currentId!=null){state[currentId]=!state[currentId];localStorage.setItem('pw-state-'+programId,JSON.stringify(state));refresh();setBtn(byId(currentId));renderImpactResult(byId(currentId))}};
 document.querySelector('#right .x').onclick=()=>{right.classList.remove('open');refresh()};
-document.getElementById('reset').onclick=()=>{if(confirm('Reset progress for '+PROGRAM.name+'?')){state={};localStorage.setItem('pw-state-'+programId,'{}');refresh()}};
+document.getElementById('reset').onclick=()=>{if(confirm('Reset progress, completion years, and impact inputs for '+PROGRAM.name+'?')){state={};impactState={};completionYears={};localStorage.setItem('pw-state-'+programId,'{}');localStorage.setItem('pw-impact-'+programId,'{}');localStorage.setItem('pw-years-'+programId,'{}');refresh()}};
 document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.value.toLowerCase().trim();refresh()});
 
 // Drag anywhere on the canvas (including cards) to pan without selecting a card.
@@ -2471,6 +2780,47 @@ canvas.addEventListener('pointerup',endPan);
 canvas.addEventListener('pointercancel',endPan);
 canvas.addEventListener('click',e=>{if(suppressCardClick){e.preventDefault();e.stopPropagation()}},true);
 
+// ── zoom: Ctrl/⌘+wheel, trackpad pinch, +/− keys, and the corner control ──
+let ZOOM=1; const ZOOM_MIN=.35, ZOOM_MAX=2.5;
+function applyZoom(){
+  const wrap=document.getElementById('tree-wrap');
+  wrap.style.transformOrigin='0 0';
+  wrap.style.transform=`scale(${ZOOM})`;
+  wrap.style.width=(treeW*ZOOM)+'px';
+  wrap.style.height=(treeH*ZOOM)+'px';
+  document.getElementById('z-val').textContent=Math.round(ZOOM*100)+'%';
+}
+function setZoom(next){
+  const cl=+Math.min(ZOOM_MAX,Math.max(ZOOM_MIN,next)).toFixed(3);
+  if(cl===ZOOM) return;
+  ZOOM=cl; applyZoom();
+}
+function zoomAt(next,clientX,clientY){
+  const rect=canvas.getBoundingClientRect();
+  // viewport-visible content point, then the underlying layout point at current zoom
+  const vx=(clientX==null?rect.width/2:clientX-rect.left);
+  const vy=(clientY==null?rect.height/2:clientY-rect.top);
+  const layoutX=(canvas.scrollLeft+vx)/ZOOM, layoutY=(canvas.scrollTop+vy)/ZOOM;
+  const zPrev=ZOOM; setZoom(next);
+  if(ZOOM===zPrev) return;
+  canvas.scrollLeft=Math.max(0,layoutX*ZOOM-vx);
+  canvas.scrollTop=Math.max(0,layoutY*ZOOM-vy);
+}
+canvas.addEventListener('wheel',e=>{
+  if(!e.ctrlKey&&!e.metaKey) return; // plain wheel keeps native scrolling
+  e.preventDefault();
+  zoomAt(ZOOM*(e.deltaY<0?1.12:0.89),e.clientX,e.clientY);
+},{passive:false});
+document.getElementById('z-in').onclick=()=>zoomAt(ZOOM+.15);
+document.getElementById('z-out').onclick=()=>zoomAt(ZOOM-.15);
+window.addEventListener('keydown',e=>{
+  const t=e.target;
+  if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT')) return;
+  if(e.key==='+'||e.key==='='){zoomAt(ZOOM+.15)}
+  else if(e.key==='-'||e.key==='_'){zoomAt(ZOOM-.15)}
+  else if(e.key==='0'&&e.shiftKey){zoomAt(1)}
+});
+
 // ── titlebar: program dropdown, export, import, help ──
 function fillSelect(){
   const sel=document.getElementById('pg-select');
@@ -2480,7 +2830,7 @@ function fillSelect(){
 document.getElementById('pg-select').onchange=e=>loadProgram(e.target.value);
 document.getElementById('btn-help').onclick=()=>document.getElementById('help-modal').classList.add('open');
 document.getElementById('btn-export').onclick=()=>{
-  const blob=new Blob([JSON.stringify({program:PROGRAM.name, jurisdiction:PROGRAM.jurisdiction, progress:state},null,1)],{type:'application/json'});
+  const blob=new Blob([JSON.stringify({program:PROGRAM.name, jurisdiction:PROGRAM.jurisdiction, progress:state, impact_inputs:impactState, completion_years:completionYears, scenario:scenario},null,1)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(PROGRAM.id||'pathways')+'-progress.json';a.click();
 };
 document.getElementById('btn-import-pg').onclick=()=>document.getElementById('import-modal').classList.add('open');
@@ -2494,7 +2844,18 @@ document.getElementById('import-go').onclick=()=>{
   let pg;
   const msg=document.getElementById('import-msg');
   try{ pg=JSON.parse(document.getElementById('import-text').value) }catch(e){ msg.textContent='✗ Invalid JSON: '+e.message; return }
-  if(!pg.id||!pg.name||!Array.isArray(pg.actions)) { msg.textContent='✗ Missing required fields: id, name, actions[]'; return }
+  if(!pg.id||!pg.name||!Array.isArray(pg.actions)) {
+    // progress import: {progress:{}, impact_inputs:{}, completion_years:{}, scenario:{}, progress_program:'<id>'}
+    if(!pg.progress || typeof pg.progress!=='object') { msg.textContent='✗ Missing required fields: id, name, actions[] (program) or progress{} (progress)'; return }
+    const targetId=pg.progress_program||programId;
+    const pid=store.all()[targetId]?targetId:programId;
+    const apply=(key,storeKey)=>{ if(pg[key] && typeof pg[key]==='object') localStorage.setItem(storeKey+pid,JSON.stringify(pg[key])) };
+    apply('progress','pw-state-'); apply('impact_inputs','pw-impact-'); apply('completion_years','pw-years-'); apply('scenario','pw-scenario-');
+    loadProgram(pid);
+    document.getElementById('import-modal').classList.remove('open');
+    msg.textContent='';
+    return;
+  }
   const custom=store.custom(); custom[pg.id]=pg; store.saveCustom(custom);
   fillSelect(); loadProgram(pg.id);
   document.getElementById('import-modal').classList.remove('open');
@@ -2517,7 +2878,7 @@ sel.innerHTML=`<option data-builtin>BUILTIN</option>`; // temporary
     } catch (e) { console.warn('[pathways] ?data= load failed, using builtin:', e.message); }
   }
   const all = store.all();
-  fillSelect();
+  fillSelect();bindScenarioInputs();
   const cur = localStorage.getItem('pathways-current');
   loadProgram(all[cur] ? cur : BUILTIN.id);
 })();

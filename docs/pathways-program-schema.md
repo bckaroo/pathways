@@ -34,7 +34,12 @@ three places:
                      "submit": "...", "timeframe": "...", "recert": "...",
                      "elig": "...", "phase": "..." } ],
       "lookback": "10 years",                // optional retroactive credit window
-      "cobenefits": ["NYSERDA ..."]          // optional funding synergies
+      "cobenefits": ["NYSERDA ..."],         // optional funding synergies
+      "impact": {                              // optional concept-planning assumption
+        "kind": "direct",                      // direct | enabling | adaptation
+        "max_annual_mtco2e": 500,              // rounded, editable per action
+        "overlap_group": "municipal-fleet"     // total uses group maximum, not sum
+      }
   } ]
 }
 ```
@@ -76,3 +81,26 @@ npm run build && npm run start -- -p <port>
   (the tree app falls back to its builtin module).
 - New program modules must satisfy the JSON Schema (add in
   `scripts/validate-module.mjs` when the first third-party program arrives).
+
+## Illustrative GHG impact assumptions
+
+Impact modeling is deliberately separate from certification scoring. A direct
+action's modeled annual impact is its own `max_annual_mtco2e` assumption
+multiplied by credited points divided by that action's maximum available points;
+the ratio is clamped from zero to one. There is no program-wide CSC
+point-to-ton conversion factor. Point displays may be numbers, ranges, or tiered
+lists; the largest listed value is the denominator.
+
+`enabling` actions and `adaptation` actions receive no direct quantified impact.
+When direct actions share an `overlap_group`, the portfolio total uses the
+largest modeled value in that group rather than adding all of them. This avoids
+obvious double counting between policies, projects, and performance actions
+that can describe the same reductions.
+
+The CSC renderer provides rounded demonstration defaults for a limited set of
+direct implementation actions and classifies the rest as enabling or
+adaptation. Users can replace each direct action's maximum and credited points
+in the dossier; those inputs persist only in browser storage. Imported program
+modules can provide their own `impact` objects. All displayed results are
+concept-planning illustrations, not an emissions inventory, forecast, achieved
+reduction, or DEC-approved accounting method.

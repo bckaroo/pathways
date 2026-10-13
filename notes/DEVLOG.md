@@ -3,6 +3,34 @@
 Append-only log of each round of development on this repo (part of DevOS
 project **PROJ-025**). New entries go at the top.
 
+## 2026-10-12 — Sleepy Hollow scenario, trajectory chart, zoom (DEV-282 follow-up, agent:hermes)
+
+**What was built**
+- Line chart under Illustrative annual impact: BAU vs with-actions vs target paths, driven by each action's completion year and modeled annual savings; scenario assumptions (baseline 74,615 t from the Sleepy Hollow 2019 community inventory, growth, target year/%) editable, persisted, and exported. Overlap groups de-duplicate year by year; savings start in the completion year; emissions floor at zero; pre-baseline completions apply from the baseline year.
+- Progress import: the import modal now accepts progress JSON (progress/impact_inputs/completion_years/scenario) in addition to program modules.
+- Canvas zoom: Ctrl/⌘+wheel and trackpad pinch (anchored at the pointer), +/− and Shift+0 keys, and a corner −/%/+ control; native wheel scrolling, drag-pan, and click-suppression preserved at all zooms (35–250%).
+- Card badges: modeled/max GHG impact next to points, plus per-card Year completed (persisted, exported).
+- Authored demo JSONs: `public/pathways/sleepy-hollow-progress.json` (real Sept 2025 Bronze certification, 178 pts/27 actions, 19 mapped in-tree) and a workspace aggressive 50%-by-2040 concept scenario.
+
+**Verification**
+- `npm run test:tree`: 11/11 pass (trajectory start-year/overlap/partial-points/zero-floor, scenario bounds, prior suites).
+- lint/tsc/build green; browser-verified zoom paths (buttons, keys, ctrl-wheel), drag vs click at zoom, Sleepy Hollow real-progress import (19/67, 150 pts) and aggressive-2040 import (target met, on path from 2032).
+- Fixed: inverted chart y-mapping (flat/lines-wrong-way), summary "target reached" false positive, summary render crash after an edit.
+
+## 2026-10-12 — Illustrative per-action GHG impact model (DEV-282, agent:hermes)
+
+**What was built**
+- Added a concept-planning annual GHG model that uses explicit, rounded maximum assumptions on 19 direct CSC actions. Each action is prorated by credited points divided by its own maximum points, clamped from zero to one; no universal CSC point-to-ton factor is used.
+- Added editable credited-point and maximum-impact inputs to direct-action dossiers, with separate local browser persistence. Numeric, range, and tiered point displays are supported, while the existing completion state remains independent and backward-compatible.
+- Classified all other CSC actions as enabling or adaptation with no direct quantified impact. Related direct actions share overlap groups whose portfolio contribution is the largest modeled value rather than the sum.
+- Added an overlap-adjusted left-pane estimate, action-level formula and classification in the dossier, methodology disclosures, help/schema guidance, and impact inputs in progress exports.
+
+**Verification**
+- `npm run test:tree`: 8/8 pass, including formula clamps, point parsing, classification, overlap aggregation, and required UI/disclosure checks.
+- `npm run lint`, `npx tsc -p tsconfig.json --noEmit`, `npm run build`, and `git diff --check`: clean; 6/6 routes generated.
+- Browser on `127.0.0.1:3005`: 67 cards rendered with no captured page errors; a 2.5-of-5 point input produced ~50 t CO₂e/yr from a 100 t/yr action maximum; the total and points metric updated while completion stayed 0/67. Enabling and adaptation dossiers showed no direct quantified impact. Existing completion toggling still moved 0/67 → 1/67 → 0/67 independently.
+- Work left uncommitted and unpushed.
+
 ## 2026-10-12 — Tree semantic subgroup and phase layout (DEV-280, agent:hermes)
 
 **What was built**

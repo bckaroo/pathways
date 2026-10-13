@@ -1,0 +1,111 @@
+{
+ "program": "Climate Smart Communities",
+ "jurisdiction": "Village of Sleepy Hollow, NY \u2014 CSC Bronze (178 pts, Sept 2025), climatesmart.ny.gov certification report",
+ "progress": {
+  "2": true,
+  "3": true,
+  "5": true,
+  "129": true,
+  "6": true,
+  "7": true,
+  "21": true,
+  "23": true,
+  "63": true,
+  "66": true,
+  "74": true,
+  "75": true,
+  "76": true,
+  "83": true,
+  "85": true,
+  "88": true,
+  "125": true,
+  "126": true,
+  "150": true
+ },
+ "impact_inputs": {
+  "2": {
+   "creditedPoints": 20
+  },
+  "3": {
+   "creditedPoints": 10
+  },
+  "5": {
+   "creditedPoints": 3
+  },
+  "129": {
+   "creditedPoints": 3
+  },
+  "6": {
+   "creditedPoints": 16
+  },
+  "7": {
+   "creditedPoints": 16
+  },
+  "21": {
+   "creditedPoints": 3
+  },
+  "23": {
+   "creditedPoints": 3
+  },
+  "63": {
+   "creditedPoints": 8
+  },
+  "66": {
+   "creditedPoints": 15
+  },
+  "74": {
+   "creditedPoints": 4
+  },
+  "75": {
+   "creditedPoints": 5
+  },
+  "76": {
+   "creditedPoints": 6
+  },
+  "83": {
+   "creditedPoints": 3
+  },
+  "85": {
+   "creditedPoints": 8
+  },
+  "88": {
+   "creditedPoints": 3
+  },
+  "125": {
+   "creditedPoints": 3
+  },
+  "126": {
+   "creditedPoints": 3
+  },
+  "150": {
+   "creditedPoints": 18
+  }
+ },
+ "completion_years": {
+  "2": 2022,
+  "3": 2022,
+  "5": 2024,
+  "129": 2018,
+  "6": 2022,
+  "7": 2022,
+  "23": 2024,
+  "63": 2022,
+  "66": 2021,
+  "74": 2024,
+  "75": 2025,
+  "76": 2015,
+  "83": 2024,
+  "85": 2023,
+  "88": 2023,
+  "125": 2025,
+  "126": 2025,
+  "150": 2018
+ },
+ "scenario": {
+  "baselineAnnual": 74615,
+  "baselineYear": 2019,
+  "bauGrowthPct": 0,
+  "targetYear": 2030,
+  "targetReductionPct": 40
+ }
+}
