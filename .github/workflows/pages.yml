@@ -67,9 +67,9 @@ jobs:
             psql -h localhost -p 5433 -U pathways -d pathways -q -v ON_ERROR_STOP=1
 
       - name: Seed the CSC tree program (not in the checklist snapshot)
-        env:
-          DATABASE_URL: postgresql://pathways:***@localhost:5433/pathways
-        run: npx tsx scripts/seed-tree-program.ts
+        # tsx does not load .env (drizzle-kit does, which is why db:migrate
+        # works with the scrub-marked URL above). Load it explicitly.
+        run: node --env-file=.env node_modules/tsx/dist/cli.mjs scripts/seed-tree-program.ts
 
       - name: Sanity-check the restored row counts
         env:
