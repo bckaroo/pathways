@@ -65,6 +65,12 @@ jobs:
         run: |
           gunzip -c data/pathways-snapshot.sql.gz | \
             psql -h localhost -p 5433 -U pathways -d pathways -q -v ON_ERROR_STOP=1
+      # The snapshot predates the tree migration (0002), so apply migrations
+      # again over the restored tables — drizzle skips what is already applied.
+      - name: Re-apply migrations over the restored snapshot
+        env:
+          DATABASE_URL: postgresql://pathways:pathways@localhost:5433/pathways
+        run: npm run db:migrate
 
       - name: Seed the CSC tree program (not in the checklist snapshot)
         run: npx tsx scripts/seed-tree-program.ts
