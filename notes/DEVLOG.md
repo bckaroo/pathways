@@ -3,6 +3,18 @@
 Append-only log of each round of development on this repo (part of DevOS
 project **PROJ-025**). New entries go at the top.
 
+## 2026-10-12 — Pages deploy fix: ship /tree + DB-backed program module (DEV-282 follow-up, agent:hermes)
+
+**What was built**
+- Fixed the GitHub Pages build that had failed twice since DEV-278: `force-dynamic` on `/api/program/[slug]` is illegal under `output: export`, and the route wasn't in the static-export swap list. The route is now registered in `scripts/to-static-export.mjs` and exports `generateStaticParams` for `csc-tree`, so Pages ships a real 67-action JSON prerendered from the build DB.
+- CI now seeds `csc-tree` after the snapshot restore (the checklist snapshot predates it), asserts 67 tree actions, and verifies `out/tree` and the exported program module exist with real content.
+- `/tree` page builds raw `<a>`/`<iframe>` URLs with `PAGES_BASE_PATH` so they resolve under the repo sub-path (raw URLs don't inherit Next's basePath).
+- Local static-export simulation run end-to-end: seed → apply → STATIC_EXPORT build → verified `out/api/program/csc-tree` (67 actions, real content), `out/tree/index.html`, `out/pathways/tech-tree.html` → revert. (Note: pathways-db must be running; the first attempt failed with an empty `generateStaticParams` when the DB was down — an ECONNREFUSED turned into a confusing "missing generateStaticParams" build error.)
+
+**Verification**
+- Live site at https://bckaroo.github.io/pathways/map/ currently shows both basemap-degraded AND "Map data layer did not load" banners — the data-layer half is a real open bug (basemap-degraded alone is by design when tiles.openfreemap.org is unreachable). The repo's `test_basemap_fallback.py` could not verify the fallback locally ("__pathwaysMap absent"), so the fallback path remains unverified. OPEN — do not treat the map as healthy on Pages until this is chased.
+- `npm run test:tree`, lint, tsc, `npm run build`, `git diff --check`: green.
+
 ## 2026-10-12 — Sleepy Hollow scenario, trajectory chart, zoom (DEV-282 follow-up, agent:hermes)
 
 **What was built**

@@ -66,6 +66,11 @@ jobs:
           gunzip -c data/pathways-snapshot.sql.gz | \
             psql -h localhost -p 5433 -U pathways -d pathways -q -v ON_ERROR_STOP=1
 
+      - name: Seed the CSC tree program (not in the checklist snapshot)
+        env:
+          DATABASE_URL: postgresql://pathways:***@localhost:5433/pathways
+        run: npx tsx scripts/seed-tree-program.ts
+
       - name: Sanity-check the restored row counts
         env:
           PGPASSWORD: pathways
@@ -88,6 +93,13 @@ jobs:
           check cec_completions 5336
           check cec_designations 942
           check crosswalk 35
+          # The tree program is seeded from the authored module above; a
+          # missing seed would silently ship a 404 as the tree's data source.
+          tree_actions=$(q "SELECT COUNT(*) FROM actions WHERE program_slug='csc-tree'")
+          if [ "$tree_actions" != "67" ]; then
+            echo "::error::csc-tree has $tree_actions actions, expected 67"; exit 1
+          fi
+          echo "  ok  csc-tree actions = $tree_actions"
 
       - name: Switch routes to static rendering
         run: node scripts/to-static-export.mjs apply
@@ -117,6 +129,12 @@ jobs:
           grep -q "245" "$f"               || { echo "::error::profile has no points"; exit 1; }
           grep -q "Emissions sectors addressed" "$f" || { echo "::error::sector radial missing"; exit 1; }
           echo "  ok  profile content verified"
+          # The tree app and its DB-backed program module must both ship.
+          [ -f out/tree.html ] || { echo "::error::tree page missing from export"; exit 1; }
+          tree_data=$(find out -path '*api/program/csc-tree*' -type f | head -1)
+          [ -n "$tree_data" ] || { echo "::error::csc-tree program module missing from export"; exit 1; }
+          grep -q "CSC Pledge" "$tree_data" || { echo "::error::csc-tree module has no action data"; exit 1; }
+          echo "  ok  tree page + program module verified"
 
       - name: Disable Jekyll
         # Pages runs Jekyll by default, which drops directories beginning with an

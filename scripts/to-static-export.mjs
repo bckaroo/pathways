@@ -34,6 +34,7 @@ const ROUTES = [
   "src/app/map/page.tsx",
   "src/app/communities/page.tsx",
   "src/app/communities/[uid]/page.tsx",
+  "src/app/api/program/[slug]/route.ts",
 ];
 
 const LIVE = 'export const dynamic = "force-dynamic";';

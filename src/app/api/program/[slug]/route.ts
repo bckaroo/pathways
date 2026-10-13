@@ -12,6 +12,17 @@ import { actions, programs } from "@/db/schema";
  */
 export const dynamic = "force-dynamic";
 
+/**
+ * Static-export support: under `output: export` (GitHub Pages) this handler is
+ * prerendered at build time with the build's seeded DB, so Pages ships a real
+ * snapshot of the program module. In the live deployment this is a no-op list
+ * that simply documents the served slug. Required by Next for dynamic route
+ * handlers under static export.
+ */
+export function generateStaticParams() {
+  return [{ slug: "csc-tree" }];
+}
+
 const toActionId = (externalId: string): number | null => {
   const m = externalId.match(/^action-(\d+)$/);
   return m ? Number(m[1]) : null;

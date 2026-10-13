@@ -8,6 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function TreePage() {
+  // Static export (GitHub Pages) serves from a repo sub-path; raw <a>/<iframe>
+  // URLs do NOT get Next's basePath prefix, so build them explicitly.
+  const base = process.env.PAGES_BASE_PATH ?? "";
   return (
     <main className="flex h-[calc(100vh-57px)] flex-col">
       <div className="flex items-center gap-3 border-b border-line bg-panel/60 px-6 py-2 text-sm text-ink-muted">
@@ -17,7 +20,7 @@ export default function TreePage() {
           actions). Progress is tracked in your browser only.
         </span>
         <a
-          href="/pathways/tech-tree.html"
+          href={`${base}/pathways/tech-tree.html`}
           target="_blank"
           rel="noreferrer"
           className="rounded border border-line px-3 py-1 hover:text-ok-solid"
@@ -29,7 +32,7 @@ export default function TreePage() {
         </Link>
       </div>
       <iframe
-        src="/pathways/tech-tree.html?data=/api/program/csc-tree"
+        src={`${base}/pathways/tech-tree.html?data=${base}/api/program/csc-tree`}
         title="Pathways skill tree"
         className="w-full flex-1 border-0"
       />
