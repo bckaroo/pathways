@@ -94,7 +94,8 @@ jobs:
           }
           check municipalities 1024
           check certifications 185
-          check actions 229
+          # 229 checklist actions + 67 csc-tree actions seeded this run (same table)
+          check actions 296
           check completions 4530
           check cec_completions 5336
           check cec_designations 942
