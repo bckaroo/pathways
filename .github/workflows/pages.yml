@@ -69,8 +69,7 @@ jobs:
       - name: Seed the CSC tree program (not in the checklist snapshot)
         run: npx tsx scripts/seed-tree-program.ts
         env:
-        env:
-          DATABASE_URL: postgresql://pathways:pathways@localhost:5433/pathways
+          DATABASE_URL: postgresql://pathways:***@localhost:5433/pathways
 
       - name: Sanity-check the restored row counts
         env:
@@ -131,7 +130,7 @@ jobs:
           grep -q "Emissions sectors addressed" "$f" || { echo "::error::sector radial missing"; exit 1; }
           echo "  ok  profile content verified"
           # The tree app and its DB-backed program module must both ship.
-          [ -f out/tree.html ] || { echo "::error::tree page missing from export"; exit 1; }
+          [ -f out/tree/index.html ] || { echo "::error::tree page missing from export"; exit 1; }
           tree_data=$(find out -path '*api/program/csc-tree*' -type f | head -1)
           [ -n "$tree_data" ] || { echo "::error::csc-tree program module missing from export"; exit 1; }
           grep -q "CSC Pledge" "$tree_data" || { echo "::error::csc-tree module has no action data"; exit 1; }
