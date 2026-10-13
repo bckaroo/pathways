@@ -1,0 +1,978 @@
+{
+  "id": "a0822f3a-76c1-4285-9cbb-baee591f8362",
+  "prevId": "789876b2-125e-4515-9780-545c16009964",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.actions": {
+      "name": "actions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "program_slug": {
+          "name": "program_slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "external_id": {
+          "name": "external_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pledge_element": {
+          "name": "pledge_element",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "legacy_action_no": {
+          "name": "legacy_action_no",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "legacy_action_name": {
+          "name": "legacy_action_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "points_min": {
+          "name": "points_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "points_max": {
+          "name": "points_max",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "points_display": {
+          "name": "points_display",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "variable_points": {
+          "name": "variable_points",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "mandatory": {
+          "name": "mandatory",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "priority": {
+          "name": "priority",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "funding_eligible": {
+          "name": "funding_eligible",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "cec_related": {
+          "name": "cec_related",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "status_tags": {
+          "name": "status_tags",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "icon": {
+          "name": "icon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tier": {
+          "name": "tier",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tree_why": {
+          "name": "tree_why",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "prereq_external_ids": {
+          "name": "prereq_external_ids",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "details": {
+          "name": "details",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lookback": {
+          "name": "lookback",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cobenefits": {
+          "name": "cobenefits",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "actions_program_slug_programs_slug_fk": {
+          "name": "actions_program_slug_programs_slug_fk",
+          "tableFrom": "actions",
+          "tableTo": "programs",
+          "columnsFrom": [
+            "program_slug"
+          ],
+          "columnsTo": [
+            "slug"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "actions_program_external_id_key": {
+          "name": "actions_program_external_id_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "program_slug",
+            "external_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.cec_completions": {
+      "name": "cec_completions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "municipality_uid": {
+          "name": "municipality_uid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "action_external_id": {
+          "name": "action_external_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "raw_action_name": {
+          "name": "raw_action_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parent_category": {
+          "name": "parent_category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "points_approved": {
+          "name": "points_approved",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "points_currently_valued": {
+          "name": "points_currently_valued",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "points_achieved": {
+          "name": "points_achieved",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "points_eligible": {
+          "name": "points_eligible",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "action_stage": {
+          "name": "action_stage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "action_status": {
+          "name": "action_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "completed_on": {
+          "name": "completed_on",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "approved_on": {
+          "name": "approved_on",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "cec_completions_municipality_uid_municipalities_portal_uid_fk": {
+          "name": "cec_completions_municipality_uid_municipalities_portal_uid_fk",
+          "tableFrom": "cec_completions",
+          "tableTo": "municipalities",
+          "columnsFrom": [
+            "municipality_uid"
+          ],
+          "columnsTo": [
+            "portal_uid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "cec_completions_municipality_action_date_key": {
+          "name": "cec_completions_municipality_action_date_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "municipality_uid",
+            "raw_action_name",
+            "completed_on"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.cec_designations": {
+      "name": "cec_designations",
+      "schema": "",
+      "columns": {
+        "municipality_uid": {
+          "name": "municipality_uid",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "cec_community_id": {
+          "name": "cec_community_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "designation_status": {
+          "name": "designation_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "advanced_designation": {
+          "name": "advanced_designation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "star_rating": {
+          "name": "star_rating",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "community_size": {
+          "name": "community_size",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "region": {
+          "name": "region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geo_id": {
+          "name": "geo_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "population": {
+          "name": "population",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hias_approved": {
+          "name": "hias_approved",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "points_achieved_new": {
+          "name": "points_achieved_new",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "points_achieved_old": {
+          "name": "points_achieved_old",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "points_achieved_total": {
+          "name": "points_achieved_total",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "current_star_status": {
+          "name": "current_star_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_threshold": {
+          "name": "last_threshold",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "next_threshold": {
+          "name": "next_threshold",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "till_next_star": {
+          "name": "till_next_star",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "latest_action_approved_on": {
+          "name": "latest_action_approved_on",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "cec_designations_municipality_uid_municipalities_portal_uid_fk": {
+          "name": "cec_designations_municipality_uid_municipalities_portal_uid_fk",
+          "tableFrom": "cec_designations",
+          "tableTo": "municipalities",
+          "columnsFrom": [
+            "municipality_uid"
+          ],
+          "columnsTo": [
+            "portal_uid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.certification_levels": {
+      "name": "certification_levels",
+      "schema": "",
+      "columns": {
+        "level": {
+          "name": "level",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "level_name": {
+          "name": "level_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "points_required": {
+          "name": "points_required",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.certifications": {
+      "name": "certifications",
+      "schema": "",
+      "columns": {
+        "cert_uid": {
+          "name": "cert_uid",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "municipality_uid": {
+          "name": "municipality_uid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "level": {
+          "name": "level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "level_name": {
+          "name": "level_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "points_approved": {
+          "name": "points_approved",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "certified_on": {
+          "name": "certified_on",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "report_url": {
+          "name": "report_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicant_url": {
+          "name": "applicant_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "certifications_municipality_uid_municipalities_portal_uid_fk": {
+          "name": "certifications_municipality_uid_municipalities_portal_uid_fk",
+          "tableFrom": "certifications",
+          "tableTo": "municipalities",
+          "columnsFrom": [
+            "municipality_uid"
+          ],
+          "columnsTo": [
+            "portal_uid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.completions": {
+      "name": "completions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "certification_uid": {
+          "name": "certification_uid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "municipality_uid": {
+          "name": "municipality_uid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "action_external_id": {
+          "name": "action_external_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "raw_action_name": {
+          "name": "raw_action_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "points_awarded": {
+          "name": "points_awarded",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "summary": {
+          "name": "summary",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "completions_certification_uid_certifications_cert_uid_fk": {
+          "name": "completions_certification_uid_certifications_cert_uid_fk",
+          "tableFrom": "completions",
+          "tableTo": "certifications",
+          "columnsFrom": [
+            "certification_uid"
+          ],
+          "columnsTo": [
+            "cert_uid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "completions_municipality_uid_municipalities_portal_uid_fk": {
+          "name": "completions_municipality_uid_municipalities_portal_uid_fk",
+          "tableFrom": "completions",
+          "tableTo": "municipalities",
+          "columnsFrom": [
+            "municipality_uid"
+          ],
+          "columnsTo": [
+            "portal_uid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "completions_cert_raw_action_key": {
+          "name": "completions_cert_raw_action_key",
+          "nullsNotDistinct": false,
+          "columns": [
+            "certification_uid",
+            "raw_action_name"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.crosswalk": {
+      "name": "crosswalk",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "csc_action_external_id": {
+          "name": "csc_action_external_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cec_hia_id": {
+          "name": "cec_hia_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cec_hia_name": {
+          "name": "cec_hia_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.municipalities": {
+      "name": "municipalities",
+      "schema": "",
+      "columns": {
+        "portal_uid": {
+          "name": "portal_uid",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "area_type": {
+          "name": "area_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "county": {
+          "name": "county",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "latitude": {
+          "name": "latitude",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "longitude": {
+          "name": "longitude",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "certification_level": {
+          "name": "certification_level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "certification_level_name": {
+          "name": "certification_level_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cert_uid": {
+          "name": "cert_uid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "has_gold_star": {
+          "name": "has_gold_star",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.programs": {
+      "name": "programs",
+      "schema": "",
+      "columns": {
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "agency": {
+          "name": "agency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "jurisdiction": {
+          "name": "jurisdiction",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "point_ceiling": {
+          "name": "point_ceiling",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "levels": {
+          "name": "levels",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "required_actions": {
+          "name": "required_actions",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "categories": {
+          "name": "categories",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category_names": {
+          "name": "category_names",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tiers": {
+          "name": "tiers",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

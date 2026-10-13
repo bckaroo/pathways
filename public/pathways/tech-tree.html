@@ -49,13 +49,21 @@
   #pe-list div{font-family:Verdana,sans-serif}
   #reset{margin-top:auto;background:transparent;border:1px solid var(--line);color:var(--silver);font-family:Verdana,sans-serif;font-size:10px;padding:6px;border-radius:5px;cursor:pointer}
   /* ════ CENTER ════ */
-  #center{flex:1;overflow:auto;height:100%;position:relative}
-  #tree-wrap{position:relative;margin:0 auto 60px auto}
-  .lane{position:absolute;left:0;right:0;border-radius:10px;border:1px solid rgba(201,169,89,.19);background:rgba(255,255,255,.015)}
-  .lane-label{position:absolute;left:10px;top:9px;font-family:Verdana,sans-serif;font-size:9.5px;color:var(--gold);letter-spacing:.15em;text-transform:uppercase}
-  .tier-lbl{position:absolute;top:6px;transform:translateX(-50%);color:var(--gold);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;text-align:center;white-space:nowrap;width:300px;font-family:Verdana,sans-serif}
-  .tier-lbl b{display:block;font-size:11.5px;color:var(--cream);letter-spacing:.08em;margin-top:2px;font-family:Georgia,serif}
-  .card{position:absolute;width:236px;background:var(--panel-dark);border:1px solid #4a4234;border-radius:6px;padding:9px 10px 9px;cursor:pointer;transition:box-shadow .15s, opacity .2s;will-change:transform;z-index:4}
+  #center{flex:1;overflow:auto;height:100%;position:relative;cursor:grab;touch-action:none}
+  #center.panning,#center.panning .card{cursor:grabbing;user-select:none}
+  #tree-wrap{position:relative;margin:0 auto 60px auto;isolation:isolate}
+  #phase-grid,#group-layer{position:absolute;inset:0;pointer-events:none}
+  #phase-grid{z-index:0}
+  #group-layer{z-index:1}
+  .phase-column{position:absolute;top:0;bottom:0;border-left:1px solid rgba(201,169,89,.28);border-right:1px solid rgba(201,169,89,.09);background:rgba(255,255,255,.018)}
+  .phase-column.alt{background:rgba(201,169,89,.035)}
+  .phase-header{position:sticky;left:14px;right:14px;top:10px;height:54px;margin:10px 14px 0;padding:10px 12px;border:1px solid rgba(201,169,89,.34);border-radius:7px;background:rgba(16,21,29,.94);color:var(--gold);font-family:Verdana,sans-serif;font-size:9px;letter-spacing:.14em;text-transform:uppercase;white-space:normal;line-height:1.35;z-index:5}
+  .phase-header b{display:block;color:var(--cream);font-family:Georgia,serif;font-size:12px;letter-spacing:.06em;text-transform:none;margin-top:2px}
+  .lane{position:absolute;left:8px;right:8px;border-radius:10px;border:1px solid rgba(201,169,89,.22);background:rgba(12,17,24,.18)}
+  .lane-label{position:sticky;left:12px;top:8px;display:inline-block;max-width:205px;padding:5px 8px;border-radius:5px;background:#171d27;border:1px solid rgba(201,169,89,.23);font-family:Verdana,sans-serif;font-size:9.5px;color:var(--gold-bright);letter-spacing:.1em;text-transform:uppercase;z-index:2}
+  .subgroup{position:absolute;left:12px;right:12px;border-top:1px solid rgba(154,164,176,.18);background:linear-gradient(90deg,rgba(154,164,176,.04),transparent 34%)}
+  .subgroup-label{position:sticky;left:20px;top:8px;display:inline-block;max-width:190px;padding:4px 7px;border-radius:4px;background:#202733;border-left:2px solid var(--gold);color:#c8d0d9;font-family:Verdana,sans-serif;font-size:9px;letter-spacing:.08em;text-transform:uppercase;z-index:2}
+  .card{position:absolute;width:220px;min-height:112px;background:var(--panel-dark);border:1px solid #4a4234;border-radius:6px;padding:9px 10px 9px;cursor:pointer;transition:box-shadow .15s, opacity .2s;will-change:transform;z-index:4}
   .card.dim{opacity:.15;pointer-events:none}
   .card.available{border-color:var(--gold)}
   .card.available .icon{border-color:var(--gold)}
@@ -145,8 +153,10 @@
     <button id="reset">↺ Reset progress</button>
   </div>
 
-  <div id="center">
+  <div id="center" aria-label="Pathway canvas. Drag to pan; click an action card for details. Wheel or trackpad scrolling also works.">
     <div id="tree-wrap">
+      <div id="phase-grid"></div>
+      <div id="group-layer"></div>
       <svg id="edges"></svg>
       <div id="cards"></div>
     </div>
@@ -195,6 +205,7 @@
       "tier": 0, "category": "PE1", "points": "4",
       "prereq": [],                  // ids of prerequisite actions
       "tags": ["mandatory"],         // priority | grant | cec | mandatory | perf
+      "subgroup": "Governance",      // optional authored semantic theme
       "why": "short hook for the card",
       "details": [ {"title": "...", "points_how": "...", "submit": "...", "timeframe": "...", "recert": "..."} ],
       "lookback": "10 years",        // optional retroactive credit window
@@ -219,7 +230,7 @@ try { Object.entries(JSON.parse(localStorage.getItem('pathways-programs')||'{}')
 const BUILTIN_CSC = document.getElementById('pg-csc-data')||null;
 </script>
 <script>
-const BUILTIN = {
+let BUILTIN = {
  "id": "csc-ny",
  "name": "Climate Smart Communities",
  "jurisdiction": "New York State · NYSDEC",
@@ -2089,6 +2100,152 @@ const BUILTIN = {
 </script>
 <script>
 /* ══ PATHWAYS ENGINE — universal across programs ══ */
+/* TREE_LAYOUT_START */
+const PathwaysLayout = (() => {
+  const CSC_PROGRAM_IDS = new Set(['csc-ny', 'csc-tree']);
+  const CSC_THEME_GROUPS = {
+    'Governance & Capacity': [1, 2, 3, 4],
+    'Regional Partnerships': [5, 129],
+    'Government Operations Planning': [6, 8, 10],
+    'Community-wide Planning': [7, 9, 11],
+    'Municipal Buildings': [12, 13, 14, 16, 26, 43],
+    'Fleet & Municipal Mobility': [21, 22, 23, 147],
+    'Renewable Procurement': [44],
+    'Clean Energy Projects': [46, 48, 49, 50],
+    'Recycling': [31, 61],
+    'Organics': [62, 63, 158],
+    'Refrigerants': [165],
+    'Land Use & Building Codes': [66, 67, 151, 161],
+    'Transportation & Mobility': [74, 75, 76, 78, 164],
+    'Nature & Forestry': [82, 83],
+    'Resilience Planning': [85, 87, 88],
+    'Extreme Heat': [91],
+    'Flooding & Stormwater': [99, 103, 104, 105],
+    'Nature-based Resilience': [97, 100],
+    'Community Clean Energy': [150, 152],
+    'Communications': [125, 126],
+    'Education & Engagement': [122, 123],
+    'Measurement & Reporting': [42, 127, 128],
+    'Innovation & Case Studies': [30],
+    'Facilities Performance': [132, 134],
+    'Fleet Performance': [133]
+  };
+  const CSC_THEME_BY_ACTION = Object.fromEntries(
+    Object.entries(CSC_THEME_GROUPS).flatMap(([label, ids]) => ids.map(id => [id, label]))
+  );
+  const CONTENT_THEMES = [
+    ['Extreme Heat', /extreme heat|heat emergency|cooling center|urban heat/],
+    ['Flooding & Stormwater', /flood|stormwater|culvert|dam\b|freeboard|sea.?level/],
+    ['Transportation & Mobility', /transport|transit|complete street|bike|biking|walking|fleet|vehicle|charging station|safe routes/],
+    ['Municipal Buildings', /municipal building|government building|hvac|lighting|benchmark|energy management system/],
+    ['Nature & Forestry', /forest|forestry|natural resource|natural area|wetland|tree canopy/],
+    ['Land Use & Building Codes', /land use|zoning|smart growth|comprehensive plan|building code|solar permit/],
+    ['Materials & Waste', /recycl|waste|compost|organic|materials|refrigerant/],
+    ['Clean Energy', /solar|renewable|heat pump|green power|clean energy/],
+    ['Public Engagement', /engagement|education|website|social media|campaign/],
+    ['Emissions & Climate Planning', /ghg|greenhouse gas|emissions target|climate action plan|inventory/],
+    ['Resilience Planning', /resilien|adaptation|vulnerability/],
+    ['Performance & Reporting', /performance|progress report|tracking system/],
+    ['Governance & Capacity', /task force|coordinator|green team|partnership|pledge/]
+  ];
+  const slug = value => String(value).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'general';
+  function authoredSubgroup(program, action) {
+    const direct = action.subgroup || action.theme || (program.action_subgroups || {})[action.id];
+    if (direct) return typeof direct === 'string' ? direct : direct.label;
+    const groups = Array.isArray(program.subgroups) ? program.subgroups : [];
+    const match = groups.find(group => (group.action_ids || group.actions || []).map(String).includes(String(action.id)));
+    return match && (match.label || match.name);
+  }
+  function themeForAction(program, action) {
+    const authored = authoredSubgroup(program, action);
+    if (authored) return { key: slug(authored), label: authored, source: 'module' };
+    if (CSC_PROGRAM_IDS.has(program.id) && CSC_THEME_BY_ACTION[action.id]) {
+      const label = CSC_THEME_BY_ACTION[action.id];
+      return { key: slug(label), label, source: 'csc-map' };
+    }
+    const text = `${action.name || ''} ${action.why || ''}`.toLowerCase();
+    const found = CONTENT_THEMES.find(([, pattern]) => pattern.test(text));
+    const label = found ? found[0] : 'General';
+    return { key: slug(label), label, source: found ? 'content' : 'fallback' };
+  }
+  function buildLayout(program) {
+    const CARD_WIDTH = 220, CARD_HEIGHT = 112, STACK_GAP = 14;
+    const LABEL_WIDTH = 236, PHASE_SLOT_WIDTH = 238, PHASE_SLOTS = 3;
+    const PHASE_WIDTH = PHASE_SLOT_WIDTH * PHASE_SLOTS;
+    const TOP = 84, LANE_HEADER = 40, GROUP_HEADER = 30, GROUP_BOTTOM = 12, LANE_GAP = 18;
+    const actions = program.actions || [];
+    const byId = new Map(actions.map(action => [String(action.id), action]));
+    const depthMemo = new Map();
+    function samePhaseDepth(action, visiting = new Set()) {
+      const id = String(action.id);
+      if (depthMemo.has(id)) return depthMemo.get(id);
+      if (visiting.has(id)) return 0;
+      visiting.add(id);
+      const parents = (action.prereq || []).map(p => byId.get(String(p))).filter(p => p && p.tier === action.tier);
+      const depth = parents.length ? 1 + Math.max(...parents.map(parent => samePhaseDepth(parent, visiting))) : 0;
+      visiting.delete(id); depthMemo.set(id, depth); return depth;
+    }
+    const categories = program.categories || Object.keys(program.category_names || {});
+    const tierCount = Math.max((program.tiers || []).length, actions.length ? Math.max(...actions.map(a => a.tier || 0)) + 1 : 1);
+    const positions = {}, groups = [], lanes = [];
+    let y = TOP;
+    categories.forEach(category => {
+      const laneActions = actions.filter(action => action.category === category).sort((a, b) => a.tier - b.tier || String(a.id).localeCompare(String(b.id), undefined, { numeric: true }));
+      if (!laneActions.length) return;
+      const grouped = new Map();
+      laneActions.forEach(action => {
+        const theme = themeForAction(program, action);
+        const groupKey = `${category}:${theme.key}`;
+        if (!grouped.has(groupKey)) grouped.set(groupKey, { key: groupKey, category, label: theme.label, actions: [] });
+        grouped.get(groupKey).actions.push(action);
+      });
+      const orderedGroups = [...grouped.values()].sort((a, b) => {
+        const at = Math.min(...a.actions.map(action => action.tier));
+        const bt = Math.min(...b.actions.map(action => action.tier));
+        return at - bt || a.label.localeCompare(b.label);
+      });
+      const laneY = y;
+      y += LANE_HEADER;
+      orderedGroups.forEach(group => {
+        const groupY = y;
+        const cells = new Map();
+        group.actions.forEach(action => {
+          const slot = Math.min(PHASE_SLOTS - 1, samePhaseDepth(action));
+          const cell = `${action.tier}:${slot}`;
+          const stack = cells.get(cell) || 0;
+          cells.set(cell, stack + 1);
+          positions[action.id] = {
+            x: LABEL_WIDTH + action.tier * PHASE_WIDTH + slot * PHASE_SLOT_WIDTH + 9,
+            y: groupY + GROUP_HEADER + stack * (CARD_HEIGHT + STACK_GAP),
+            theme: group.label,
+            phase: action.tier,
+            phaseSlot: slot
+          };
+        });
+        const maxStack = Math.max(1, ...cells.values());
+        const groupHeight = GROUP_HEADER + maxStack * (CARD_HEIGHT + STACK_GAP) + GROUP_BOTTOM;
+        groups.push({ key: group.key, category, label: group.label, y: groupY, height: groupHeight });
+        y += groupHeight;
+      });
+      const laneHeight = y - laneY + 8;
+      lanes.push({ category, label: (program.category_names || {})[category] || category, y: laneY, height: laneHeight });
+      y += LANE_GAP;
+    });
+    const height = y + 36;
+    const width = LABEL_WIDTH + tierCount * PHASE_WIDTH + 72;
+    const phases = Array.from({ length: tierCount }, (_, tier) => ({
+      tier,
+      x: LABEL_WIDTH + tier * PHASE_WIDTH,
+      width: PHASE_WIDTH,
+      label: (program.tiers || [])[tier] || `Phase ${tier + 1}`
+    }));
+    return { positions, groups, lanes, phases, width, height, cardWidth: CARD_WIDTH, cardHeight: CARD_HEIGHT, phaseWidth: PHASE_WIDTH };
+  }
+  return { buildLayout, themeForAction };
+})();
+if (typeof module !== 'undefined') module.exports = PathwaysLayout;
+/* TREE_LAYOUT_END */
+
 const store = {
   all(){ try{return Object.assign({[BUILTIN.id]:BUILTIN}, JSON.parse(localStorage.getItem('pathways-programs')||'{}'))}catch(e){return {[BUILTIN.id]:BUILTIN}} },
   saveCustom(list){ localStorage.setItem('pathways-programs', JSON.stringify(list)) },
@@ -2112,49 +2269,50 @@ function loadProgram(pid){
   document.title = 'Pathways — ' + PROGRAM.name;
 }
 
-// ── layout ──
-const COL_W=420, CARD_H=128, GAP=14, TOP=120;
 const pos={}, cardEls={};
-let treeW=0, treeH=0;
+let treeW=0, treeH=0, activeLayout=null;
 function lanes(){ return (PROGRAM.categories||Object.keys(PROGRAM.category_names||{})); }
 function byId(id){ return PROGRAM.actions.find(x=>x.id===id); }
 
 function buildTree(){
   const wrap=document.getElementById('tree-wrap');
   document.getElementById('cards').innerHTML='';
-  cardEls.length=0;
-  const tierCount = Math.max(...PROGRAM.actions.map(a=>a.tier))+1;
-  treeW = tierCount*COL_W + 240;
+  document.getElementById('phase-grid').innerHTML='';
+  document.getElementById('group-layer').innerHTML='';
+  Object.keys(cardEls).forEach(key=>delete cardEls[key]);
+  Object.keys(pos).forEach(key=>delete pos[key]);
+  activeLayout=PathwaysLayout.buildLayout(PROGRAM);
+  Object.assign(pos,activeLayout.positions);
+  treeW=activeLayout.width; treeH=activeLayout.height;
   wrap.style.width = treeW+'px';
-  // tier labels
-  (PROGRAM.tiers||[]).forEach((label,t)=>{
-    const el=document.createElement('div');el.className='tier-lbl';
-    el.style.left=(180+t*COL_W+118)+'px'; el.style.top='8px';
-    el.innerHTML=`<b>${label}</b>`;wrap.appendChild(el);
+  wrap.style.height=treeH+'px';
+  const phaseGrid=document.getElementById('phase-grid');
+  activeLayout.phases.forEach(phase=>{
+    const el=document.createElement('div');el.className='phase-column'+(phase.tier%2?' alt':'');
+    el.style.left=phase.x+'px';el.style.width=phase.width+'px';
+    const parts=phase.label.split(/\s+[—–-]\s+/,2);
+    el.innerHTML=`<div class="phase-header">Phase ${phase.tier+1}<b>${parts[1]||phase.label}</b></div>`;
+    phaseGrid.appendChild(el);
   });
-  const byLane={};
-  PROGRAM.actions.forEach(a=>{(byLane[a.category]=byLane[a.category]||[]).push(a)});
-  let y=TOP; pos.length=0;
-  lanes().forEach(pe=>{
-    const list=byLane[pe]; if(!list) return;
-    list.sort((a,b)=>a.tier-b.tier||a.id-b.id);
-    const lane=document.createElement('div');lane.className='lane';lane.style.top=(y-16)+'px';
-    const lbl=document.createElement('div');lbl.className='lane-label';lbl.textContent=(PROGRAM.category_names||{})[pe]||pe;lane.appendChild(lbl);
-    const h=list.length*(CARD_H+GAP)+38;
-    lane.style.height=h+'px';
-    document.getElementById('cards').appendChild(lane);
-    list.forEach(a=>pos[a.id]={x:180+a.tier*COL_W, y:y+32+list.indexOf(a)*(CARD_H+GAP)});
-    y+=h+22;
+  const groupLayer=document.getElementById('group-layer');
+  activeLayout.lanes.forEach(item=>{
+    const lane=document.createElement('div');lane.className='lane';lane.style.top=item.y+'px';lane.style.height=item.height+'px';
+    const lbl=document.createElement('div');lbl.className='lane-label';lbl.textContent=item.label;lane.appendChild(lbl);groupLayer.appendChild(lane);
   });
-  treeH=y+40; wrap.style.height=treeH+'px';
+  activeLayout.groups.forEach(item=>{
+    const group=document.createElement('div');group.className='subgroup';group.dataset.theme=item.label;
+    group.style.top=item.y+'px';group.style.height=item.height+'px';
+    const lbl=document.createElement('div');lbl.className='subgroup-label';lbl.textContent=item.label;group.appendChild(lbl);groupLayer.appendChild(group);
+  });
   // cards
   PROGRAM.actions.forEach(a=>{
     const p=pos[a.id], d=document.createElement('div');d.className='card';
+    d.dataset.theme=p.theme;
     d.style.left=p.x+'px';d.style.top=p.y+'px';
     const tags=(a.tags||[]).map(tg=>`<span class="tag ${tg.toLowerCase()}">${tg}</span>`).join('');
     d.innerHTML=`<div class="check">✔</div><div class="top"><div class="icon">${a.icon||'📄'}</div><h3>${a.name}</h3></div>
       <div class="meta"><span class="pts">${a.points} pts</span><span class="pe">${a.category}</span></div>${tags?`<div class="tags">${tags}</div>`:''}`;
-    d.onclick=()=>openPanel(a.id);
+    d.onclick=()=>{if(!suppressCardClick)openPanel(a.id)};
     cardEls[a.id]=d;document.getElementById('cards').appendChild(d);
   });
   document.getElementById('edges').style.width=treeW+'px';
@@ -2171,7 +2329,7 @@ function refresh(chainIds, focusId){
   PROGRAM.actions.forEach(a=>{
     (a.prereq||[]).forEach(p=>{
       const A=pos[p],B=pos[a.id];
-      const x1=A.x+236,y1=A.y+44,x2=B.x,y2=B.y+44,mx=(x1+x2)/2;
+      const x1=A.x+activeLayout.cardWidth,y1=A.y+44,x2=B.x,y2=B.y+44,mx=(x1+x2)/2;
       const done=state[p]&&state[a.id];
       const onChain=chainIds&&chainIds.has(a.id);
       const col=onChain?'rgba(169,127,214,.95)':!state[p]?'rgba(120,125,135,.22)':(done?'rgba(201,169,89,.85)':'rgba(201,169,89,.45)');
@@ -2226,7 +2384,10 @@ function hud(){
   lanes().forEach(pe=>{
     const all=P.actions.filter(a=>a.category===pe); if(!all.length) return;
     const dn=all.filter(a=>state[a.id]).length;
-    pl.push(`<div class="bar-row" style="margin-bottom:6px"><div class="lbl"><span>${pe}</span><span>${dn}/${all.length}</span></div><div class="track"><div class="fill pe" style="width:${dn/all.length*100}%"></div></div></div>`);
+    const named=(P.category_names||{})[pe]||pe;
+    const description=pe==='PE2' && ['csc-tree','csc-ny'].includes(P.id) ? 'Inventory emissions, set goals, and plan for climate action' : named.replace(new RegExp('^'+pe+'\\s*[·:]\\s*'), '');
+    const label=pe.startsWith('PE') ? pe+': '+description.charAt(0).toUpperCase()+description.slice(1).toLowerCase() : named;
+    pl.push(`<div class="bar-row" style="margin-bottom:9px"><div class="lbl"><span style="max-width:85%;white-space:normal;line-height:1.35">${label}</span><span>${dn}/${all.length}</span></div><div class="track"><div class="fill pe" style="width:${dn/all.length*100}%"></div></div></div>`);
   });
   document.getElementById('pe-list').innerHTML=pl.join('');
 }
@@ -2242,7 +2403,7 @@ function openPanel(id){
   const a=byId(id);
   document.getElementById('p-icon').textContent=a.icon||'📄';
   document.getElementById('p-name').textContent=a.name;
-  document.getElementById('p-sub').textContent=`${a.category} · ${a.points} pts`;
+  document.getElementById('p-sub').textContent=`${a.category} · ${pos[id].theme} · ${a.points} pts`;
   const badges=(a.tags||[]).map(tg=>`<span class="tag ${tg.toLowerCase()}">${tg}</span>`).join('');
   const elig=(a.details||[])[0]&&a.details[0].elig;
   document.getElementById('p-badges').innerHTML=badges+(elig?`<span class="pe">Eligibility: ${esc(elig)}</span>`:'');
@@ -2273,7 +2434,7 @@ function openPanel(id){
   if(!un&&!state[id]){pBtn.style.display='none'}else{pBtn.style.display='block';setBtn(a)}
   right.classList.add('open');
   refresh(chain, id);
-  setTimeout(()=>{const ctr=document.getElementById('center'); ctr.scrollTo({left:Math.max(0,pos[id].x-ctr.clientWidth/2+118),behavior:'smooth'})},0);
+  setTimeout(()=>{const ctr=document.getElementById('center'); ctr.scrollTo({left:Math.max(0,pos[id].x-ctr.clientWidth/2+activeLayout.cardWidth/2),behavior:'smooth'})},0);
 }
 function setBtn(a){
   pBtn.textContent=state[a.id]?'✓ Completed — click to undo':'Mark this action completed';
@@ -2283,6 +2444,32 @@ pBtn.onclick=()=>{if(currentId!=null){state[currentId]=!state[currentId];localSt
 document.querySelector('#right .x').onclick=()=>{right.classList.remove('open');refresh()};
 document.getElementById('reset').onclick=()=>{if(confirm('Reset progress for '+PROGRAM.name+'?')){state={};localStorage.setItem('pw-state-'+programId,'{}');refresh()}};
 document.getElementById('search').addEventListener('input',e=>{searchQ=e.target.value.toLowerCase().trim();refresh()});
+
+// Drag anywhere on the canvas (including cards) to pan without selecting a card.
+const canvas=document.getElementById('center');
+let pan=null, suppressCardClick=false;
+canvas.addEventListener('pointerdown',e=>{
+  if(e.button!==0 || (pan && pan.id!==e.pointerId)) return;
+  pan={id:e.pointerId,x:e.clientX,y:e.clientY,left:canvas.scrollLeft,top:canvas.scrollTop,moved:false};
+});
+canvas.addEventListener('pointermove',e=>{
+  if(!pan || e.pointerId!==pan.id) return;
+  const dx=e.clientX-pan.x,dy=e.clientY-pan.y;
+  if(!pan.moved && Math.hypot(dx,dy)<5) return;
+  if(!pan.moved){pan.moved=true;if(e.isTrusted)canvas.setPointerCapture(e.pointerId)}
+  canvas.classList.add('panning');
+  canvas.scrollLeft=pan.left-dx; canvas.scrollTop=pan.top-dy;
+});
+function endPan(e){
+  if(!pan || e.pointerId!==pan.id) return;
+  suppressCardClick=pan.moved;
+  if(pan.moved) setTimeout(()=>{suppressCardClick=false},0);
+  pan=null;canvas.classList.remove('panning');
+  if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
+}
+canvas.addEventListener('pointerup',endPan);
+canvas.addEventListener('pointercancel',endPan);
+canvas.addEventListener('click',e=>{if(suppressCardClick){e.preventDefault();e.stopPropagation()}},true);
 
 // ── titlebar: program dropdown, export, import, help ──
 function fillSelect(){
@@ -2317,7 +2504,18 @@ document.getElementById('reset').onclick_backup=null;
 // boot
 const sel=document.getElementById('pg-select');
 sel.innerHTML=`<option data-builtin>BUILTIN</option>`; // temporary
-(() => {
+(async () => {
+  // ?data=<url> — load an authored program module over HTTP (DB-backed) instead of builtin
+  const qs = new URLSearchParams(location.search);
+  const dataUrl = qs.get('data');
+  if (dataUrl) {
+    try {
+      const pg = await (await fetch(dataUrl)).json();
+      if (!pg.id || !Array.isArray(pg.actions) || !pg.actions.length) throw new Error('module missing id/actions');
+      BUILTIN = pg;
+      localStorage.removeItem('pathways-current');
+    } catch (e) { console.warn('[pathways] ?data= load failed, using builtin:', e.message); }
+  }
   const all = store.all();
   fillSelect();
   const cur = localStorage.getItem('pathways-current');

@@ -28,6 +28,14 @@ export const programs = pgTable("programs", {
   status: text("status").notNull().default("active"), // 'active' | 'closed'
   sourceUrl: text("source_url"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  // ── Pathways tech-tree module (DEV-278) ──
+  jurisdiction: text("jurisdiction"), // display string, e.g. "New York State · NYSDEC"
+  pointCeiling: integer("point_ceiling"), // top certification threshold
+  levels: jsonb("levels").$type<{ name: string; min_points: number; min_categories: number }[]>(),
+  requiredActions: jsonb("required_actions").$type<string[]>(), // external_ids gating all levels above Registered
+  categories: jsonb("categories").$type<string[]>(), // lane order, e.g. ['PE1',...,'Perf']
+  categoryNames: jsonb("category_names").$type<Record<string, string>>(),
+  tiers: jsonb("tiers").$type<string[]>(), // column headers, e.g. 'I — Foundation'
 });
 
 /** Municipalities (CSC applicants: cities, towns, villages, counties). */
@@ -75,6 +83,16 @@ export const actions = pgTable(
     statusTags: jsonb("status_tags").$type<string[]>().notNull().default([]),
     sourceUrl: text("source_url"),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    // ── Pathways tech-tree module (DEV-278) — authored by the module importer ──
+    icon: text("icon"), // emoji glyph on the tree card
+    tier: integer("tier"), // column index in the tech tree
+    treeWhy: text("tree_why"), // one-line hook for the card
+    prereqExternalIds: jsonb("prereq_external_ids").$type<string[]>(), // prerequisite actions (stable external ids)
+    details: jsonb("details").$type<
+      { title?: string; why?: string; how?: string; points_how?: string; submit?: string; timeframe?: string; governments?: string; recert?: string; elig?: string; phase?: string }[]
+    >(), // dossier sections sourced from the program's action pages
+    lookback: text("lookback"), // retroactive credit window, e.g. "10 years"
+    cobenefits: jsonb("cobenefits").$type<string[]>(), // funding / program synergies
   },
   (t) => [
     unique("actions_program_external_id_key").on(t.programSlug, t.externalId),

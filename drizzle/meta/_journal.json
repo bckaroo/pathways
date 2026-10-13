@@ -15,6 +15,13 @@
       "when": 1790027614377,
       "tag": "0001_great_mikhail_rasputin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791849579207,
+      "tag": "0002_loose_mister_sinister",
+      "breakpoints": true
     }
   ]
 }

@@ -3,6 +3,21 @@
 Append-only log of each round of development on this repo (part of DevOS
 project **PROJ-025**). New entries go at the top.
 
+## 2026-10-12 — Tree semantic subgroup and phase layout (DEV-280, agent:hermes)
+
+**What was built**
+- Replaced the one-card-per-row canvas with a pure, tested layout engine that groups CSC actions into 25 authored semantic themes inside their existing Pledge Element lanes (including transportation and mobility, municipal buildings, nature and forestry, flooding and stormwater, and extreme heat).
+- Widened each implementation phase to three horizontal action slots so same-phase prerequisite sequences read left to right; added alternating phase bands, persistent vertical boundaries, and sticky phase/lane/subgroup labels during pan.
+- Generic modules can author `action.subgroup`/`action.theme`, `action_subgroups`, or top-level `subgroups`; otherwise deterministic action-content rules provide a theme and safely fall back to `General`. No prerequisite data was added or changed.
+- Preserved the in-progress DEV-279 grab-pan implementation, card selection, locked prerequisite navigation/highlighting, progress state, DB `?data=` loading, and builtin fallback.
+
+**Verification**
+- `npm run test:tree`: 3/3 pass (67-action CSC map coverage, generic fallback, collision-free horizontal layout and sequence placement).
+- `npm run lint`: clean. `npm run build`: 6/6 routes generated, including `/tree` and `/api/program/[slug]`.
+- Browser on existing preview `127.0.0.1:3006`: 67 cards, 25 subgroup bands, 8 sticky phase columns, 6020×7284 canvas; card dossier, locked prerequisite navigation, and 300 px drag-pan verified; no page errors.
+- DB container was not running, so `/api/program/csc-tree` returned the expected 503 and the browser successfully exercised the builtin fallback (67 cards/25 groups). DB-backed response was not re-verified this round.
+- Work left uncommitted and unpushed.
+
 ## Round 2 — 2026-09-21 · xiaozhu · CEC ingestion end-to-end (DEV-150)
 
 **What was built**
@@ -213,3 +228,27 @@ project **PROJ-025**). New entries go at the top.
 **Follow-ups**
 - Register a persistent Pathways port in `~/.openclaw/config/ports.json`; resolve the 3005 double-claim with PROJ-033.
 - Wire csc-ny.json into the Drizzle DB (actions table) so the tree reads live data; add GitHub Pages export of the static tree.
+
+## 2026-10-13 — Tree v2: DB-backed program (DEV-278, agent:hermes, branch feat/tree-db-drizzle)
+
+**What was built**
+- `src/db/schema.ts`: tree metadata on `programs` (jurisdiction, point_ceiling, levels, required_actions, categories, category_names, tiers) and `actions` (icon, tier, tree_why, prereq_external_ids, details, lookback, cobenefits). Migration `drizzle/0002_loose_mister_sinister.sql`.
+- `scripts/seed-tree-program.ts`: idempotent seed of an authored module into DB. Prereqs stored as external ids (`action-<N>`); ran against `public/pathways/csc-ny.json`.
+- `src/app/api/program/[slug]/route.ts`: assembles the program module from DB (force-dynamic, 503 + hint on DB-down).
+- `public/pathways/tech-tree.html`: boot honors `?data=<url>` — fetches the DB-backed module (async, before layout) and falls back to builtin on failure. `let BUILTIN` to allow override.
+- `/tree` iframe now `?data=/api/program/csc-tree`.
+
+**Verification**
+- docker pathways-db migration applied (migration 0002); DB seeded: 67 actions, 66 with prereqs, 35 with cobenefits.
+- `GET /api/program/csc-tree` → 200; a66 details=1 lookback="10 years"; a105 prereqs=[88]; required=[1,2,3]; 3 levels; 12 categories.
+- Browser: /tree iframe renders 67 cards, REGISTERED, dossier sections populate from DB data.
+- eslint clean; tsc --noEmit clean; next build 6/6 routes.
+
+**Decisions & notes**
+- Program slug `csc-tree` intentionally separate from checklist-injected `csc` (DEV-149): tree tiers/prereqs are authored content; merge with the official scorecard rows is a deliberate later step.
+- Collateral: an over-broad `pkill -f next-server` killed APA's stale 3005 listener; its live dev server (3115, per scripts/dev.sh) is intact. dev.sh comment still says 3005 — stale doc, worth fixing in PROJ-033.
+- pathways-db on /mnt storage crash-recovers slowly (~13 min fsync); consider volume on faster storage.
+
+**Follow-ups**
+- Merge to main after owner review (+ push branch for CI).
+- JSON Schema validation for third-party modules; editing UI over the DB (kills the file-edit rigidity).

@@ -29,7 +29,7 @@ export default function TreePage() {
         </Link>
       </div>
       <iframe
-        src="/pathways/tech-tree.html"
+        src="/pathways/tech-tree.html?data=/api/program/csc-tree"
         title="Pathways skill tree"
         className="w-full flex-1 border-0"
       />
