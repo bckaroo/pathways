@@ -69,7 +69,7 @@ jobs:
       - name: Seed the CSC tree program (not in the checklist snapshot)
         run: npx tsx scripts/seed-tree-program.ts
         env:
-          DATABASE_URL: postgresql://pathways:***@localhost:5433/pathways
+          DATABASE_URL: postgresql://pathways:pathways@localhost:5433/pathways
 
       - name: Sanity-check the restored row counts
         env:
