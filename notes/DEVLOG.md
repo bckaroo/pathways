@@ -3,6 +3,22 @@
 Append-only log of each round of development on this repo (part of DevOS
 project **PROJ-025**). New entries go at the top.
 
+## 2026-10-27 — Published the restyled tree + TargetSet view to GitHub Pages (DEV-314, agent:hermes)
+
+**What was built**
+- Committed the work that had been sitting uncommitted since 2026-10-13: Arc Modern light restyle, Arc Night dark mode + `pw-theme` toggle, the TargetSet ledger view (`INVENTORY_MODEL` + 13 tests), the Sleepy Hollow demo inventory JSON, and the planning captures under `notes/planning/`. Commit `f4ddac1`.
+- Pre-commit gate: `npm run test:tree` 23/23, `npm run lint` clean, `npx tsc --noEmit` clean, `git diff --check` clean.
+
+**Verification (live site, not just CI)**
+- `pages.yml` run 40555774520 green; site rebuilt from `f4ddac1`.
+- `https://bckaroo.github.io/pathways/pathways/tech-tree.html` is byte-identical to the committed artifact (470,265 B).
+- `https://bckaroo.github.io/pathways/tree/`: iframe src `/pathways/pathways/tech-tree.html?data=/pathways/api/program/csc-tree` resolves 200; the DB-backed module still reports 67 actions / 12 categories / Registered-Bronze-Silver.
+- Headless-Chrome check against the live URL: 67 cards + 12 lanes on PathFinder, TargetSet shows Community-wide 74,615 (2019) → 87,000 (2023) with 49/48/3% sectors and the 2030/2050 CLCPA stops, dark toggle persists `pw-theme=dark` and repaints to `rgb(20,22,30)`.
+
+**Follow-ups**
+- DEV-314 closed; DEV-277/278/279/280/282 remain in REVIEW.
+- Tablet touch-target sizing for cards/zoom still open.
+
 ## 2026-10-12 — Pages deploy fix: ship /tree + DB-backed program module (DEV-282 follow-up, agent:hermes)
 
 **What was built**
