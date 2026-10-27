@@ -292,3 +292,28 @@ project **PROJ-025**). New entries go at the top.
 **Follow-ups**
 - Merge to main after owner review (+ push branch for CI).
 - JSON Schema validation for third-party modules; editing UI over the DB (kills the file-edit rigidity).
+
+## 2026-10-13 — Arc Modern UI restyle (owner-picked direction, uncommitted)
+- Applied Arc Modern light theme (from 6-direction OpenDesign comparison `pathways-ui-directions`) to `public/pathways/tech-tree.html`: full color remap (dark gold/silver → warm off-white surfaces, indigo #4f46e5 accent, emerald #059669, muted #7a716a), fonts Georgia→Sora / Verdana→Inter (Inter+Sora webfonts added), radii +4-8px, phase-header + zoom-ctl lightened; zoom-ctl moved bottom-right so it no longer clips left-anchored lane labels.
+- Verification: `npm run test:tree` 11/11 pass on the restyled artifact; headless Chrome screenshots at 1440×900 + 1000×800 visually audited (no residual dark theme, contrast OK).
+- Pre-restyle backup: `~/.hermes/cache/scratch/pathways-pre-arc-bak.html` (retained).
+- Follow-ups: tablet touch-target sizes for cards/zoom; dark-mode for Planner Dark direction if wanted; commit/push on owner request (DEV id needed for message).
+
+## 2026-10-13 (2) — Dark mode added (Arc Night), uncommitted
+- Theme system: hardcoded hexes converted to CSS vars (--bg/--pane/--panel-lit/--ink/--muted/--accent/--violet/--green/--warn/--line/--border + --tr-* trajectory colors); `html[data-theme="dark"]` token block (neutral dark surfaces #14161e/#1b1e29, lighter indigo #8b90ff, emerald #34d399); trajectory SVG strokes moved from inline attrs to classes (#trajectory path.trbau/.trtarget/.tradj, line.traxis/.trgrid, text.trtext).
+- Toggle: titlebar button `◐ Dark / ☀ Light`, persisted in localStorage `pw-theme`, defaults to OS prefers-color-scheme, `?theme=dark|light` URL override for testing/dev.
+- Also fixed 3 stale light-on-dark text colors uncovered by the light restyle (.impact-result, .subgroup-label, #right .p-locked-note li → var(--ink)).
+- Verification: test:tree 11/11 pass; headless screenshots light + dark (1440×900) visually audited, PASS both, no residual theme artifacts.
+- Brand tagline changed to "setting the path to climate action" (owner wording); nowrap, hidden under 1000px viewport; .tb-btn compacted + nowrap at tablet width (fixed 2-line button wrap at 900px). test:tree 11/11.
+
+## 2026-10-13 (3) — Planning round: app flow drafts (no code)
+- Saved owner's .excalidraw app-flow diagram: notes/planning/app-flow.excalidraw (+ JSON extract from earlier).
+- Drafted notes/planning/targetset-mobilization-compare-drafts.md: TargetSet ledger data model w/ Sleepy Hollow filler figures (gov-ops 1,078 MtCO2e 2018; community 74,615 MtCO2e 2019 + ~87,000 2023 update; CLCPA 40/85 targets); Mobilization = extension of shcapdashboard (Sheets CSV pipeline, same 49-action schema); Compare-pathways as persisted trajectory snapshots compared as tonnage lines to target (metrics: target-met year, cost bands, points, certification). Build order: TargetSet → pathways compare → Mobilization → AI ingestion.
+- Filler data pending: SH sector shares (CAP Fig 2-1/2-2 values not yet extracted).
+
+## 2026-10-13 (4) — TargetSet tab built (uncommitted)
+- New **TargetSet** view in `public/pathways/tech-tree.html`: view-tab bar (PathFinder / TargetSet + 3 disabled planned tabs: ClimateReady, Mobilization, Collective Action), `#app-inv` panel with ledger selector, baseline card, sector bars, inventory-year list, emissions-over-time SVG (measured dots + dashed trend + dashed piecewise target path), targets table, editable trend/end-year assumptions.
+- Pure module `INVENTORY_MODEL` (tagged block, testable): ledger lookup, sector rows from absolute or %-share data, compound trend, piecewise-linear target path (floor 0, held flat after last stop), projection with measured-null-off-inventory-years, gap-to-target, targetMetYear (never reports the baseline year). 13 new tests in `tests/inventory-model.test.mjs` → suite 23/23 pass; `npx tsc --noEmit` clean; `npm run lint` clean.
+- Filler data: Sleepy Hollow CAP figures extracted from the KB'd CAP PDF and now in-code + `public/pathways/demo-sleepy-hollow-inventory.json`: community 74,615 (2019) / 87,000 (2023, Transportation 49% · Buildings 48% · Other 3%), gov-ops 1,078 (2018; Vehicle Fleet 428 · Buildings 344 · Public Lighting 179 · Water/Wastewater 127), targets −40% 2030 / −85% 2050 (CLCPA-aligned). Ledgers stay separate (gov-ops subset, never summed).
+- Bug found + fixed: the scripted light-theme remap had produced **self-referential custom properties** (`--bg:var(--bg)`, `--border:var(--border)`) in `:root`, so those tokens were invalid in light mode (unstyled chips/borders). Replaced with literal light tokens. Also added the missing shared `.chip/.chip-row` CSS and a tick formatter that stops "1k/1k/1k" collapsing on small ledgers.
+- Deep links for review: `?view=targetset|pathfinder`, `?theme=dark|light`, `?ledger=community|govops`.

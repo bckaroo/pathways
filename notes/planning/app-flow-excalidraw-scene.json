@@ -1,0 +1,537 @@
+[
+ {
+  "id": "gRkWuhlTzxScgX9JBjCqU",
+  "type": "rectangle",
+  "x": 1000,
+  "y": 500,
+  "w": 180,
+  "h": 85,
+  "binds": [
+   "zJVf83-SNRJ9oSDTem4Ih"
+  ],
+  "bg": "#a5d8ff",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "zJVf83-SNRJ9oSDTem4Ih",
+  "type": "text",
+  "x": 1037,
+  "y": 505,
+  "w": 107,
+  "h": 75,
+  "text": "PathFinder\n\"Selecting\nActions\"",
+  "binds": [],
+  "st": "solid",
+  "containerId": "gRkWuhlTzxScgX9JBjCqU"
+ },
+ {
+  "id": "jyCP7SoQnrgH1_gvHG8ql",
+  "type": "rectangle",
+  "x": 1000,
+  "y": 600,
+  "w": 180,
+  "h": 85,
+  "binds": [
+   "BUyFlYjcFRH3jD_uAotRm"
+  ],
+  "bg": "#a5d8ff",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "BUyFlYjcFRH3jD_uAotRm",
+  "type": "text",
+  "x": 1033,
+  "y": 605,
+  "w": 114,
+  "h": 75,
+  "text": "Mobilization\n\"Monitoring\nProgress\"",
+  "binds": [],
+  "st": "solid",
+  "containerId": "jyCP7SoQnrgH1_gvHG8ql"
+ },
+ {
+  "id": "-3qmrrA-sqv_6hf0Hy66W",
+  "type": "rectangle",
+  "x": 1000,
+  "y": 300,
+  "w": 180,
+  "h": 85,
+  "binds": [
+   "Td5NFQEN1wZUbQUReK-gS"
+  ],
+  "bg": "#a5d8ff",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "Td5NFQEN1wZUbQUReK-gS",
+  "type": "text",
+  "x": 1026,
+  "y": 305,
+  "w": 129,
+  "h": 75,
+  "text": "TargetSet\n\"Baseline and\nTargets",
+  "binds": [],
+  "st": "solid",
+  "containerId": "-3qmrrA-sqv_6hf0Hy66W"
+ },
+ {
+  "id": "a6tZCy04XAx_zNIjPJFRP",
+  "type": "rectangle",
+  "x": 1000,
+  "y": 400,
+  "w": 180,
+  "h": 85,
+  "binds": [
+   "y9Q_51a2yu8EwDhBAlxm"
+  ],
+  "bg": "#a5d8ff",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "cy9Q_51a2yu8EwDhBAlxm",
+  "type": "text",
+  "x": 1022,
+  "y": 405,
+  "w": 136,
+  "h": 75,
+  "text": "ClimateReady\n\"Adaptation &\nResiliency\"",
+  "binds": [],
+  "st": "solid",
+  "containerId": "a6tZCy04XAx_zNIjPJFRP"
+ },
+ {
+  "id": "BnoXxOOB1zGuVSiKC-2XN",
+  "type": "rectangle",
+  "x": 1600,
+  "y": 300,
+  "w": 180,
+  "h": 85,
+  "binds": [
+   "_PwrfMcixT0i16q5sST"
+  ],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "78_PwrfMcixT0i16q5sST",
+  "type": "text",
+  "x": 1605,
+  "y": 330,
+  "w": 170,
+  "h": 25,
+  "text": "Export Pathways",
+  "binds": [],
+  "st": "solid",
+  "containerId": "BnoXxOOB1zGuVSiKC-2XN"
+ },
+ {
+  "id": "8T5wFRiMvQhQ9a6_asB2o",
+  "type": "rectangle",
+  "x": 1800,
+  "y": 620,
+  "w": 180,
+  "h": 85,
+  "binds": [
+   "JNv9G1h2NhnX_mtxXNNI"
+  ],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "eJNv9G1h2NhnX_mtxXNNI",
+  "type": "text",
+  "x": 1845,
+  "y": 625,
+  "w": 91,
+  "h": 75,
+  "text": "Compare\ndifferent\npathways",
+  "binds": [],
+  "st": "solid",
+  "containerId": "8T5wFRiMvQhQ9a6_asB2o"
+ },
+ {
+  "id": "Zr3PTLavCM_jRBCvCvQuZ",
+  "type": "rectangle",
+  "x": 1600,
+  "y": 700,
+  "w": 180,
+  "h": 85,
+  "binds": [
+   "KhwYVzk-anGx6KuDhskbB"
+  ],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "KhwYVzk-anGx6KuDhskbB",
+  "type": "text",
+  "x": 1613,
+  "y": 705,
+  "w": 155,
+  "h": 75,
+  "text": "AI Ingestion of\nInventory\nReports",
+  "binds": [],
+  "st": "solid",
+  "containerId": "Zr3PTLavCM_jRBCvCvQuZ"
+ },
+ {
+  "id": "a6lr_CtU-vXnNOX-0qdi2",
+  "type": "rectangle",
+  "x": 1800,
+  "y": 300,
+  "w": 180,
+  "h": 85,
+  "binds": [
+   "quNJbNN31IOIh5Kwmk3y4"
+  ],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "quNJbNN31IOIh5Kwmk3y4",
+  "type": "text",
+  "x": 1813,
+  "y": 318,
+  "w": 154,
+  "h": 50,
+  "text": "Import Existing\nCSC Actions",
+  "binds": [],
+  "st": "solid",
+  "containerId": "a6lr_CtU-vXnNOX-0qdi2"
+ },
+ {
+  "id": "I6HuGe-qM9Q-qg-brFST5",
+  "type": "rectangle",
+  "x": 1800,
+  "y": 400,
+  "w": 180,
+  "h": 85,
+  "binds": [
+   "KiAsMQWhKOHu6Uxe8ZXII"
+  ],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "KiAsMQWhKOHu6Uxe8ZXII",
+  "type": "text",
+  "x": 1812,
+  "y": 405,
+  "w": 155,
+  "h": 75,
+  "text": "Integrates with\nany Climate\nAction Program",
+  "binds": [],
+  "st": "solid",
+  "containerId": "I6HuGe-qM9Q-qg-brFST5"
+ },
+ {
+  "id": "5ew0NcE2SlHFSIM1Pgono",
+  "type": "rectangle",
+  "x": 1800,
+  "y": 500,
+  "w": 180,
+  "h": 110,
+  "binds": [
+   "XofO3Kq3tk3bUl8mH5DW"
+  ],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "5XofO3Kq3tk3bUl8mH5DW",
+  "type": "text",
+  "x": 1815,
+  "y": 505,
+  "w": 151,
+  "h": 100,
+  "text": "Can see how\nother\ncommunities are\ntaking action",
+  "binds": [],
+  "st": "solid",
+  "containerId": "5ew0NcE2SlHFSIM1Pgono"
+ },
+ {
+  "id": "hRrmRP10ur9-lT3cyzUkc",
+  "type": "rectangle",
+  "x": 1600,
+  "y": 400,
+  "w": 180,
+  "h": 85,
+  "binds": [
+   "Nr5Nj0B5z6JMNftBC38L8"
+  ],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "Nr5Nj0B5z6JMNftBC38L8",
+  "type": "text",
+  "x": 1623,
+  "y": 418,
+  "w": 133,
+  "h": 50,
+  "text": "Calculate CSC\nSteps",
+  "binds": [],
+  "st": "solid",
+  "containerId": "hRrmRP10ur9-lT3cyzUkc"
+ },
+ {
+  "id": "y9B6jjtaME0xih46YKFWp",
+  "type": "rectangle",
+  "x": 1600,
+  "y": 500,
+  "w": 180,
+  "h": 85,
+  "binds": [
+   "uGEvb60DdqZZJq-T2mDiE"
+  ],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "uGEvb60DdqZZJq-T2mDiE",
+  "type": "text",
+  "x": 1613,
+  "y": 518,
+  "w": 153,
+  "h": 50,
+  "text": "Visualize decarb\nscenarios",
+  "binds": [],
+  "st": "solid",
+  "containerId": "y9B6jjtaME0xih46YKFWp"
+ },
+ {
+  "id": "aHkFCsK79BKrckBxfy6h5",
+  "type": "rectangle",
+  "x": 1600,
+  "y": 600,
+  "w": 180,
+  "h": 85,
+  "binds": [
+   "qvJwvuJlPMfHfmWAV2gi-"
+  ],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "qvJwvuJlPMfHfmWAV2gi-",
+  "type": "text",
+  "x": 1615,
+  "y": 618,
+  "w": 149,
+  "h": 50,
+  "text": "Understand\nClimate Actions",
+  "binds": [],
+  "st": "solid",
+  "containerId": "aHkFCsK79BKrckBxfy6h5"
+ },
+ {
+  "id": "qS2g7mpA41F0jDAkhGxvL",
+  "type": "rectangle",
+  "x": 720,
+  "y": 300,
+  "w": 180,
+  "h": 85,
+  "binds": [
+   "je7jBO7CbhAPs4dQG8iK0",
+   "X7NM2hE_rfpjdNlaqSVm8",
+   "YVzwEQA4ENFhmCwrErKeA"
+  ],
+  "bg": "#b2f2bb",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "je7jBO7CbhAPs4dQG8iK0",
+  "type": "text",
+  "x": 729,
+  "y": 305,
+  "w": 162,
+  "h": 75,
+  "text": "Collective Action\n\"What is\nhappening\"",
+  "binds": [],
+  "st": "solid",
+  "containerId": "qS2g7mpA41F0jDAkhGxvL"
+ },
+ {
+  "id": "RnNOaVo6mSUiaVFpsXhC_",
+  "type": "diamond",
+  "x": 480,
+  "y": 280,
+  "w": 160,
+  "h": 120,
+  "binds": [
+   "HBVi3dDjqVmdH1RFtp_6",
+   "X7NM2hE_rfpjdNlaqSVm8"
+  ],
+  "bg": "#ffec99",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "4HBVi3dDjqVmdH1RFtp_6",
+  "type": "text",
+  "x": 533,
+  "y": 328,
+  "w": 55,
+  "h": 25,
+  "text": "Start",
+  "binds": [],
+  "bg": "#ffec99",
+  "st": "solid",
+  "containerId": "RnNOaVo6mSUiaVFpsXhC_"
+ },
+ {
+  "id": "nYS2p5nJ2qUAEhQjAzU4d",
+  "type": "rectangle",
+  "x": 980,
+  "y": 280,
+  "w": 220,
+  "h": 420,
+  "binds": [
+   "YVzwEQA4ENFhmCwrErKeA"
+  ],
+  "st": "dotted",
+  "containerId": null
+ },
+ {
+  "id": "_rRxCG3HeeYv26v-j9w-2",
+  "type": "rectangle",
+  "x": 1580,
+  "y": 280,
+  "w": 420,
+  "h": 560,
+  "binds": [],
+  "st": "dotted",
+  "containerId": null
+ },
+ {
+  "id": "1KiLIBzoGUEGmGJp0wL0Z",
+  "type": "text",
+  "x": 1000,
+  "y": 240,
+  "w": 180,
+  "h": 25,
+  "text": "Tabs",
+  "binds": [],
+  "bg": "#ffc9c9",
+  "st": "dotted",
+  "containerId": null
+ },
+ {
+  "id": "kPNWjIuL4I7DUeO9PpDM3",
+  "type": "text",
+  "x": 1580,
+  "y": 240,
+  "w": 520,
+  "h": 25,
+  "text": "Features",
+  "binds": [],
+  "bg": "#ffc9c9",
+  "st": "dotted",
+  "containerId": null
+ },
+ {
+  "id": "X7NM2hE_rfpjdNlaqSVm8",
+  "type": "arrow",
+  "x": 641,
+  "y": 341,
+  "w": 73,
+  "h": 0,
+  "p": "[[0,0],[73,0]]",
+  "binds": [],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "YVzwEQA4ENFhmCwrErKeA",
+  "type": "arrow",
+  "x": 906,
+  "y": 342,
+  "w": 54,
+  "h": 2,
+  "p": "[[0,0],[54,-2]]",
+  "binds": [],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "_634G0_1pT8UOGAnxjhJw",
+  "type": "text",
+  "x": 1220,
+  "y": 300,
+  "w": 220,
+  "h": 100,
+  "text": "TargetSet\n- GHG Inventory\n- Emission Sectors\n- Emissions over Time",
+  "binds": [],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "VqQ80Mcq3-o14JPsV_ASN",
+  "type": "text",
+  "x": 1220,
+  "y": 420,
+  "w": 320,
+  "h": 125,
+  "text": "ClimateReady\n- Climate Vulnerability (risk x\nimpact)\n- Mitigation (reduce impact)\n- Adaptation (reduce risk)",
+  "binds": [],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "lhY_JIXwt4wsnoaX8kVfe",
+  "type": "text",
+  "x": 1220,
+  "y": 560,
+  "w": 320,
+  "h": 100,
+  "text": "PathFinder\n- Climate Actions\n- Modeled GHG Mitigation\n- CoBenefits",
+  "binds": [],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "E8qv35EVLxiCqGfKWJBTn",
+  "type": "text",
+  "x": 1220,
+  "y": 680,
+  "w": 320,
+  "h": 100,
+  "text": "Mobilization\n- Climate Actions\n- Modeled GHG Mitigation\n- CoBenefits",
+  "binds": [],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ },
+ {
+  "id": "B1ZQ-nR2EPFG_zU9yigTI",
+  "type": "text",
+  "x": 720,
+  "y": 400,
+  "w": 200,
+  "h": 250,
+  "text": "- How NYS CSC\ncommunities are\nperforming (who's\nsilver, bronze,\nregistered)\n- What PEs are\ngetting\naccomplished at a\nportfolio level?\n- Geographies ",
+  "binds": [],
+  "bg": "#ffc9c9",
+  "st": "solid",
+  "containerId": null
+ }
+]

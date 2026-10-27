@@ -4,86 +4,97 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pathways — NYS Climate Smart Communities</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+
+  /* ── Arc Modern theme tokens (light default) ──
+     NB: keep literal values here — these blocks previously contained
+     self-referential vars (--border:var(--border)) which made every use
+     of those tokens invalid in light mode. */
   :root{
-    --bg:#131923; --pane:#1a2029; --panel-dark:#2a2620; --panel-lit:#3d3624;
-    --gold:#c9a959; --gold-bright:#e8cd7a; --cream:#f3ecd8;
-    --silver:#9aa4b0; --green:#5fae4f; --violet:#a97fd6;
-    --line:rgba(201,169,89,.4); --line-dim:rgba(201,169,89,.13);
+    --bg:#fbfaf8; --pane:#ffffff; --panel-dark:#ffffff; --panel-lit:#f4f1ec;
+    --ink:#2a2320; --muted:#7a716a; --accent:#4f46e5; --accent2:#059669;
+    --border:#e7e2da; --surface2:#f4f1ec;
+    --gold:var(--accent); --gold-bright:var(--accent); --cream:var(--ink);
+    --silver:var(--muted); --green:#059669; --violet:#8b7bf0;
+    --line:rgba(79,70,229,.40); --line-dim:rgba(79,70,229,.14);
+    --warn:#e8915f; --tr-bau:#7a716a; --tr-target:#e8915f; --tr-adj:#059669; --tr-grid:#f0ede6;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
-  body{background:var(--bg);color:var(--cream);font-family:Georgia,'Times New Roman',serif;overflow:hidden}
-  #titlebar{height:44px;background:#10151d;border-bottom:1px solid var(--line-dim);display:flex;align-items:center;gap:14px;padding:0 16px}
+  body{background:var(--bg);color:var(--cream);font-family:'Sora',Georgia,serif;overflow:hidden}
+  #titlebar{height:44px;background:var(--panel-lit);border-bottom:1px solid var(--line-dim);display:flex;align-items:center;gap:14px;padding:0 16px}
   #titlebar .brand{font-size:15px;letter-spacing:.22em;color:var(--gold-bright)}
-  #titlebar .brand span{color:var(--silver);letter-spacing:.08em;font-size:11px;margin-left:8px}
-  #pg-select{background:var(--pane);color:var(--cream);border:1px solid #3a4048;border-radius:6px;padding:5px 10px;font-family:Verdana,sans-serif;font-size:11px;cursor:pointer}
+  #titlebar .brand span{color:var(--silver);letter-spacing:.08em;font-size:11px;margin-left:8px;white-space:nowrap}
+  @media (max-width:1000px){#titlebar .brand span{display:none} .tb-btn{white-space:nowrap;font-size:9px;padding:5px 7px}}
+  #pg-select{background:var(--pane);color:var(--cream);border:1px solid var(--border);border-radius:10px;padding:5px 10px;font-family:Inter,'Segoe UI',sans-serif;font-size:11px;cursor:pointer}
   #titlebar .right{margin-left:auto;display:flex;gap:10px;align-items:center}
-  .tb-btn{background:transparent;border:1px solid #3a4048;color:var(--silver);font-family:Verdana,sans-serif;font-size:10px;padding:5px 10px;border-radius:5px;cursor:pointer}
+  .tb-btn{background:transparent;border:1px solid var(--border);color:var(--silver);font-family:Inter,'Segoe UI',sans-serif;font-size:10px;padding:5px 10px;border-radius:9px;cursor:pointer}
   .tb-btn:hover{border-color:var(--gold);color:var(--cream)}
   #app{display:flex;height:calc(100vh - 44px)}
   /* dark scrollbars */
   ::-webkit-scrollbar{width:10px;height:10px}
-  ::-webkit-scrollbar-track{background:#141a24}
-  ::-webkit-scrollbar-thumb{background:#333b46;border-radius:5px;border:2px solid #141a24}
-  ::-webkit-scrollbar-thumb:hover{background:#4a5560}
-  ::-webkit-scrollbar-corner{background:#141a24}
+  ::-webkit-scrollbar-track{background:var(--panel-lit)}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:9px;border:2px solid var(--panel-lit)}
+  ::-webkit-scrollbar-thumb:hover{background:var(--border)}
+  ::-webkit-scrollbar-corner{background:var(--panel-lit)}
   ::-webkit-scrollbar-button{display:none}
   /* ════ LEFT ════ */
   #left{width:280px;min-width:280px;height:100%;background:var(--pane);border-right:1px solid var(--line);overflow-y:auto;padding:18px 16px 40px;display:flex;flex-direction:column;gap:13px}
   #left h1{font-size:18px;color:var(--cream);letter-spacing:.06em;font-weight:normal;line-height:1.3;cursor:pointer}
-  #left .sub{color:var(--gold);font-size:9px;letter-spacing:.2em;text-transform:uppercase;margin-top:4px;font-family:Verdana,sans-serif}
-  #search{width:100%;background:#141a24;border:1px solid #3a4048;border-radius:6px;color:var(--cream);font-family:Verdana,sans-serif;font-size:11.5px;padding:7px 10px;outline:none}
+  #left .sub{color:var(--gold);font-size:9px;letter-spacing:.2em;text-transform:uppercase;margin-top:4px;font-family:Inter,'Segoe UI',sans-serif}
+  #search{width:100%;background:var(--panel-lit);border:1px solid var(--border);border-radius:10px;color:var(--cream);font-family:Inter,'Segoe UI',sans-serif;font-size:11.5px;padding:7px 10px;outline:none}
   #search:focus{border-color:var(--gold)}
-  .level-badge{background:var(--panel-dark);border:1px solid var(--gold);border-radius:8px;padding:11px;text-align:center}
+  .level-badge{background:var(--panel-dark);border:1px solid var(--gold);border-radius:12px;padding:11px;text-align:center}
   .level-badge .big{font-size:22px;color:var(--gold-bright)}
-  .level-badge .lbl{font-size:9px;letter-spacing:.14em;color:var(--silver);text-transform:uppercase;margin-top:3px;font-family:Verdana,sans-serif}
-  .metric{display:flex;justify-content:space-between;align-items:baseline;background:#151b26;border:1px solid #2c333d;border-radius:6px;padding:7px 12px;font-family:Verdana,sans-serif}
+  .level-badge .lbl{font-size:9px;letter-spacing:.14em;color:var(--silver);text-transform:uppercase;margin-top:3px;font-family:Inter,'Segoe UI',sans-serif}
+  .metric{display:flex;justify-content:space-between;align-items:baseline;background:var(--panel-lit);border:1px solid var(--border);border-radius:10px;padding:7px 12px;font-family:Inter,'Segoe UI',sans-serif}
   .metric .v{color:var(--gold-bright);font-size:15px}
   .metric .k{color:var(--silver);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase}
-  .impact-summary{border:1px solid rgba(95,174,79,.45);border-radius:8px;background:rgba(95,174,79,.08);padding:11px}
-  .impact-summary .value{font-size:20px;color:#9bdd8d;margin:3px 0}
-  .impact-summary p,.impact-disclosure{font:9.5px/1.45 Verdana,sans-serif;color:#9fb0c3}
+  .impact-summary{border:1px solid rgba(95,174,79,.45);border-radius:12px;background:rgba(95,174,79,.08);padding:11px}
+  .impact-summary .value{font-size:20px;color:var(--green);margin:3px 0}
+  .impact-summary p,.impact-disclosure{font:9.5px/1.45 Verdana,sans-serif;color:var(--muted)}
   #trajectory{margin-top:9px}
   #trajectory svg{display:block;width:100%}
-  #trajectory .legend{display:flex;flex-wrap:wrap;gap:7px;margin-top:5px;font:8.5px Verdana,sans-serif;color:#9fb0c3}
+  #trajectory .legend{display:flex;flex-wrap:wrap;gap:7px;margin-top:5px;font:8.5px Verdana,sans-serif;color:var(--muted)}
   #trajectory .legend i{display:inline-block;width:14px;height:2px;margin-right:3px;vertical-align:middle}
   #traj-inputs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px}
   #traj-inputs label{font:8.5px/1.3 Verdana,sans-serif;color:var(--silver);text-transform:uppercase;letter-spacing:.05em}
-  #traj-inputs input{width:100%;margin-top:3px;padding:5px;background:#10151d;color:var(--cream);border:1px solid #4a5665;border-radius:4px;font:11px Verdana,sans-serif}
+  #traj-inputs input{width:100%;margin-top:3px;padding:5px;background:var(--panel-lit);color:var(--cream);border:1px solid var(--border);border-radius:4px;font:11px Verdana,sans-serif}
   #trajectory details summary{cursor:pointer;font:9px Verdana,sans-serif;color:var(--gold);margin-top:6px;user-select:none}
   .impact-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:9px 0}
   .impact-grid label{font:9px/1.35 Verdana,sans-serif;color:var(--silver);text-transform:uppercase;letter-spacing:.06em}
-  .impact-grid input{width:100%;margin-top:4px;padding:7px;background:#10151d;color:var(--cream);border:1px solid #4a5665;border-radius:5px;font:12px Verdana,sans-serif}
-  .impact-result{padding:9px;border-left:3px solid var(--green);background:rgba(95,174,79,.08);font:11px/1.5 Verdana,sans-serif;color:#d8e8d4}
-  .impact-kind{display:inline-block;margin-bottom:7px;padding:3px 6px;border-radius:4px;background:#28313d;color:#cbd4df;font:9px Verdana,sans-serif;text-transform:uppercase;letter-spacing:.08em}
-  .sec-h{color:var(--gold-bright);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;font-family:Verdana,sans-serif;margin:6px 0 7px}
-  .bar-row .lbl{display:flex;justify-content:space-between;font-family:Verdana,sans-serif;font-size:9.5px;color:var(--silver);margin-bottom:3px}
-  .track{height:6px;background:#20242b;border-radius:4px;overflow:hidden}
+  .impact-grid input{width:100%;margin-top:4px;padding:7px;background:var(--panel-lit);color:var(--cream);border:1px solid var(--border);border-radius:9px;font:12px Verdana,sans-serif}
+  .impact-result{padding:9px;border-left:3px solid var(--green);background:rgba(95,174,79,.08);font:11px/1.5 Verdana,sans-serif;color:var(--ink)}
+  .impact-kind{display:inline-block;margin-bottom:7px;padding:3px 6px;border-radius:4px;background:var(--panel-lit);color:var(--muted);font:9px Verdana,sans-serif;text-transform:uppercase;letter-spacing:.08em}
+  .sec-h{color:var(--gold-bright);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;font-family:Inter,'Segoe UI',sans-serif;margin:6px 0 7px}
+  .bar-row .lbl{display:flex;justify-content:space-between;font-family:Inter,'Segoe UI',sans-serif;font-size:9.5px;color:var(--silver);margin-bottom:3px}
+  .track{height:6px;background:var(--panel-lit);border-radius:4px;overflow:hidden}
   .fill{height:100%;background:var(--gold);border-radius:4px;transition:width .3s}
   .fill.pe{background:var(--green)}
-  #pe-list div{font-family:Verdana,sans-serif}
-  #reset{margin-top:auto;background:transparent;border:1px solid var(--line);color:var(--silver);font-family:Verdana,sans-serif;font-size:10px;padding:6px;border-radius:5px;cursor:pointer}
+  #pe-list div{font-family:Inter,'Segoe UI',sans-serif}
+  #reset{margin-top:auto;background:transparent;border:1px solid var(--line);color:var(--silver);font-family:Inter,'Segoe UI',sans-serif;font-size:10px;padding:6px;border-radius:9px;cursor:pointer}
   /* ════ CENTER ════ */
   #center{flex:1;overflow:auto;height:100%;position:relative;cursor:grab;touch-action:none}
   #center.panning,#center.panning .card{cursor:grabbing;user-select:none}
-  #zoom-ctl{position:absolute;bottom:12px;left:12px;z-index:30;display:flex;gap:5px;align-items:center;padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:rgba(16,21,29,.95);font:10px Verdana,sans-serif;color:var(--cream);user-select:none}
-  #zoom-ctl button{width:26px;height:24px;padding:0;background:#1c222c;border:1px solid #3a4552;border-radius:5px;color:var(--cream);font:13px/1 Verdana,sans-serif;cursor:pointer}
+  #zoom-ctl{position:absolute;bottom:12px;right:12px;z-index:30;display:flex;gap:5px;align-items:center;padding:5px 8px;border:1px solid var(--border);border-radius:10px;background:rgba(255,253,248,.95);box-shadow:0 4px 14px rgba(60,50,120,.08);font:10px Inter,'Segoe UI',sans-serif;color:var(--ink);user-select:none}
+  #zoom-ctl button{width:26px;height:24px;padding:0;background:var(--pane);border:1px solid var(--border);border-radius:9px;color:var(--cream);font:13px/1 Verdana,sans-serif;cursor:pointer}
   #zoom-ctl button:hover{border-color:var(--gold)}
   #zoom-ctl .zval{min-width:38px;text-align:center}
   #tree-wrap{position:relative;margin:0 auto 60px auto;isolation:isolate}
   #phase-grid,#group-layer{position:absolute;inset:0;pointer-events:none}
   #phase-grid{z-index:0}
   #group-layer{z-index:1}
-  .phase-column{position:absolute;top:0;bottom:0;border-left:1px solid rgba(201,169,89,.28);border-right:1px solid rgba(201,169,89,.09);background:rgba(255,255,255,.018)}
-  .phase-column.alt{background:rgba(201,169,89,.035)}
-  .phase-header{position:sticky;left:14px;right:14px;top:10px;height:54px;margin:10px 14px 0;padding:10px 12px;border:1px solid rgba(201,169,89,.34);border-radius:7px;background:rgba(16,21,29,.94);color:var(--gold);font-family:Verdana,sans-serif;font-size:9px;letter-spacing:.14em;text-transform:uppercase;white-space:normal;line-height:1.35;z-index:5}
-  .phase-header b{display:block;color:var(--cream);font-family:Georgia,serif;font-size:12px;letter-spacing:.06em;text-transform:none;margin-top:2px}
-  .lane{position:absolute;left:8px;right:8px;border-radius:10px;border:1px solid rgba(201,169,89,.22);background:rgba(12,17,24,.18)}
-  .lane-label{position:sticky;left:12px;top:8px;display:inline-block;max-width:205px;padding:5px 8px;border-radius:5px;background:#171d27;border:1px solid rgba(201,169,89,.23);font-family:Verdana,sans-serif;font-size:9.5px;color:var(--gold-bright);letter-spacing:.1em;text-transform:uppercase;z-index:2}
-  .subgroup{position:absolute;left:12px;right:12px;border-top:1px solid rgba(154,164,176,.18);background:linear-gradient(90deg,rgba(154,164,176,.04),transparent 34%)}
-  .subgroup-label{position:sticky;left:20px;top:8px;display:inline-block;max-width:190px;padding:4px 7px;border-radius:4px;background:#202733;border-left:2px solid var(--gold);color:#c8d0d9;font-family:Verdana,sans-serif;font-size:9px;letter-spacing:.08em;text-transform:uppercase;z-index:2}
-  .card{position:absolute;width:220px;min-height:132px;background:var(--panel-dark);border:1px solid #4a4234;border-radius:6px;padding:9px 10px 9px;cursor:pointer;transition:box-shadow .15s, opacity .2s;will-change:transform;z-index:4}
+  .phase-column{position:absolute;top:0;bottom:0;border-left:1px solid rgba(79,70,229,.28);border-right:1px solid rgba(79,70,229,.09);background:rgba(255,255,255,.018)}
+  .phase-column.alt{background:rgba(79,70,229,.035)}
+  .phase-header{position:sticky;left:14px;right:14px;top:10px;height:54px;margin:10px 14px 0;padding:10px 12px;border:1px solid var(--line);border-radius:7px;background:rgba(255,253,248,.92);color:var(--gold);font-family:Inter,'Segoe UI',sans-serif;font-size:9px;letter-spacing:.14em;text-transform:uppercase;white-space:normal;line-height:1.35;z-index:5}
+  .phase-header b{display:block;color:var(--cream);font-family:'Sora',Georgia,serif;font-size:12px;letter-spacing:.06em;text-transform:none;margin-top:2px}
+  .lane{position:absolute;left:8px;right:8px;border-radius:14px;border:1px solid rgba(79,70,229,.22);background:rgba(12,17,24,.18)}
+  .lane-label{position:sticky;left:12px;top:8px;display:inline-block;max-width:205px;padding:5px 8px;border-radius:9px;background:var(--pane);border:1px solid rgba(79,70,229,.23);font-family:Inter,'Segoe UI',sans-serif;font-size:9.5px;color:var(--gold-bright);letter-spacing:.1em;text-transform:uppercase;z-index:2}
+  .subgroup{position:absolute;left:12px;right:12px;border-top:1px solid rgba(122,113,106,.18);background:linear-gradient(90deg,rgba(122,113,106,.04),transparent 34%)}
+  .subgroup-label{position:sticky;left:20px;top:8px;display:inline-block;max-width:190px;padding:4px 7px;border-radius:4px;background:var(--panel-lit);border-left:2px solid var(--gold);color:var(--ink);font-family:Inter,'Segoe UI',sans-serif;font-size:9px;letter-spacing:.08em;text-transform:uppercase;z-index:2}
+  .card{position:absolute;width:220px;min-height:132px;background:var(--panel-dark);border:1px solid var(--border);border-radius:10px;padding:9px 10px 9px;cursor:pointer;transition:box-shadow .15s, opacity .2s;will-change:transform;z-index:4}
   .card .meta{flex-wrap:wrap;column-gap:5px;row-gap:5px}
   .impact-badge{font:9px Verdana,sans-serif;color:var(--gold-bright);white-space:nowrap}
   .completion-year{margin-top:6px;font:9px Verdana,sans-serif;color:var(--silver)}
@@ -93,22 +104,22 @@
   .card.locked{opacity:.68}
   .card.locked.dim{opacity:.1}
   .card.done{background:var(--panel-lit);border-color:var(--gold)}
-  .card.done .icon{border-color:var(--gold-bright);background:#5a4a26}
+  .card.done .icon{border-color:var(--gold-bright);background:var(--border)}
   .card.chain{outline:2px solid var(--violet);opacity:.95}
   .card.selected{box-shadow:0 0 0 2px var(--gold-bright), 0 6px 24px rgba(0,0,0,.7);z-index:6}
   .card .top{display:flex;align-items:center;gap:9px}
-  .icon{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:23px;border:3px solid var(--silver);background:#20242b}
+  .icon{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:23px;border:3px solid var(--silver);background:var(--panel-lit)}
   .card h3{font-size:13px;color:var(--cream);font-weight:normal;line-height:1.25}
   .meta{display:flex;justify-content:space-between;align-items:center;margin-top:7px;font-family:Verdana,Arial,sans-serif}
   .pts{font-size:10.5px;color:var(--gold-bright)}
-  .pe{font-size:9.5px;color:var(--silver);background:#1c2028;border-radius:3px;padding:1px 6px}
+  .pe{font-size:9.5px;color:var(--silver);background:var(--panel-lit);border-radius:3px;padding:1px 6px}
   .tags{margin-top:6px;display:flex;gap:4px;flex-wrap:wrap}
-  .tag{font-family:Verdana,sans-serif;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;border-radius:3px;padding:1px 5px}
-  .tag.priority{background:rgba(230,120,60,.2);color:#e8915f;border:1px solid rgba(230,120,60,.4)}
-  .tag.grant{background:rgba(93,150,220,.2);color:#7fb0e8;border:1px solid rgba(93,150,220,.4)}
-  .tag.cec{background:rgba(169,127,214,.18);color:#c3a4e8;border:1px solid rgba(169,127,214,.4)}
-  .tag.mandatory{background:rgba(95,174,79,.2);color:#8fd47f;border:1px solid rgba(95,174,79,.45)}
-  .tag.performance{background:rgba(220,200,90,.2);color:#dfc95f;border:1px solid rgba(220,200,90,.4)}
+  .tag{font-family:Inter,'Segoe UI',sans-serif;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;border-radius:3px;padding:1px 5px}
+  .tag.priority{background:rgba(230,120,60,.2);color:var(--warn);border:1px solid rgba(230,120,60,.4)}
+  .tag.grant{background:rgba(93,150,220,.2);color:var(--accent);border:1px solid rgba(93,150,220,.4)}
+  .tag.cec{background:rgba(169,127,214,.18);color:var(--violet);border:1px solid rgba(169,127,214,.4)}
+  .tag.mandatory{background:rgba(95,174,79,.2);color:var(--green);border:1px solid rgba(95,174,79,.45)}
+  .tag.performance{background:rgba(220,200,90,.2);color:var(--accent);border:1px solid rgba(220,200,90,.4)}
   .check{position:absolute;top:-7px;left:-7px;width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;font-size:13px;display:none;align-items:center;justify-content:center;z-index:7}
   .card.done .check{display:flex}
   svg#edges{position:absolute;top:0;left:0;pointer-events:none;z-index:3}
@@ -118,45 +129,140 @@
   #right .head{display:flex;align-items:flex-start;gap:12px;padding-right:24px;position:relative}
   #right .head .icon{width:52px;height:52px;font-size:28px}
   #right h2{font-size:18.5px;color:var(--cream);font-weight:normal;line-height:1.3}
-  #right .sub{color:var(--gold);font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-family:Verdana,sans-serif;margin-top:4px}
+  #right .sub{color:var(--gold);font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-family:Inter,'Segoe UI',sans-serif;margin-top:4px}
   #right .x{position:absolute;top:-2px;right:0;color:var(--silver);cursor:pointer;font-size:16px}
   #right .badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:10px}
   #right section{margin-top:15px;border-top:1px solid var(--line-dim);padding-top:10px}
-  #right section h5{color:var(--gold-bright);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-family:Verdana,sans-serif;margin-bottom:6px}
-  #right section p,#right section li{font-size:11.5px;color:#cfd6df;font-family:Verdana,Arial,sans-serif;line-height:1.55}
+  #right section h5{color:var(--gold-bright);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-family:Inter,'Segoe UI',sans-serif;margin-bottom:6px}
+  #right section p,#right section li{font-size:11.5px;color:var(--muted);font-family:Verdana,Arial,sans-serif;line-height:1.55}
   #right ul{padding-left:16px}
   #right li{margin-bottom:5px}
-  #right .done-btn{margin-top:16px;padding:10px;background:var(--panel-lit);border:1px solid var(--gold);color:var(--gold-bright);font-family:Verdana,sans-serif;font-size:11px;letter-spacing:.08em;border-radius:6px;cursor:pointer}
+  #right .done-btn{margin-top:16px;padding:10px;background:var(--panel-lit);border:1px solid var(--gold);color:var(--gold-bright);font-family:Inter,'Segoe UI',sans-serif;font-size:11px;letter-spacing:.08em;border-radius:10px;cursor:pointer}
   #right .done-btn.done{background:var(--green);border-color:var(--green);color:#fff}
-  #right .p-locked-note{display:none;margin-top:12px;padding:10px 12px;border:1px solid rgba(233,145,95,.5);border-radius:6px;background:rgba(233,145,95,.07)}
-  #right .p-locked-note .t{color:#e8915f;font-size:10.5px;font-family:Verdana,sans-serif;letter-spacing:.06em;text-transform:uppercase;font-weight:bold;margin-bottom:6px}
+  #right .p-locked-note{display:none;margin-top:12px;padding:10px 12px;border:1px solid rgba(233,145,95,.5);border-radius:10px;background:rgba(233,145,95,.07)}
+  #right .p-locked-note .t{color:var(--warn);font-size:10.5px;font-family:Inter,'Segoe UI',sans-serif;letter-spacing:.06em;text-transform:uppercase;font-weight:bold;margin-bottom:6px}
   #right .p-locked-note ul{list-style:none;padding:0}
-  #right .p-locked-note li{font-size:11.5px;font-family:Verdana,sans-serif;color:#e8cdb0;padding:7px 8px;background:#22262e;border:1px solid #4a3f2e;border-radius:5px;margin-bottom:5px;cursor:pointer;display:flex;align-items:center;gap:8px}
+  #right .p-locked-note li{font-size:11.5px;font-family:Inter,'Segoe UI',sans-serif;color:var(--ink);padding:7px 8px;background:var(--panel-lit);border:1px solid var(--border);border-radius:9px;margin-bottom:5px;cursor:pointer;display:flex;align-items:center;gap:8px}
   #right .p-locked-note li:hover{border-color:var(--violet)}
   #right .p-locked-note li .st{font-size:9px;color:var(--silver);margin-left:auto;white-space:nowrap}
-  #right .chain-note{font-size:10px;color:var(--violet);font-family:Verdana,sans-serif;margin-top:6px}
+  #right .chain-note{font-size:10px;color:var(--violet);font-family:Inter,'Segoe UI',sans-serif;margin-top:6px}
   /* ════ MODALS ════ */
   .modal-bg{position:fixed;inset:0;background:rgba(5,8,12,.72);z-index:80;display:none;align-items:center;justify-content:center}
   .modal-bg.open{display:flex}
-  .modal{background:var(--pane);border:1px solid var(--gold);border-radius:10px;max-width:720px;width:92%;max-height:82vh;overflow-y:auto;padding:26px 30px;position:relative}
+  .modal{background:var(--pane);border:1px solid var(--gold);border-radius:14px;max-width:720px;width:92%;max-height:82vh;overflow-y:auto;padding:26px 30px;position:relative}
   .modal h2{color:var(--gold-bright);font-weight:normal;font-size:21px;margin-bottom:12px}
-  .modal p,.modal li{font-family:Verdana,Arial,sans-serif;font-size:12px;color:#cfd6df;line-height:1.6;margin-bottom:8px}
-  .modal pre{background:#10151d;border:1px solid #2c333d;border-radius:6px;padding:12px;font-size:10.5px;color:#9fb0c3;overflow-x:auto;font-family:'Courier New',monospace;line-height:1.5;margin:10px 0}
+  .modal p,.modal li{font-family:Verdana,Arial,sans-serif;font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:8px}
+  .modal pre{background:var(--panel-lit);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:10.5px;color:var(--muted);overflow-x:auto;font-family:'Courier New',monospace;line-height:1.5;margin:10px 0}
   .modal code{color:var(--gold-bright)}
   .modal .x{position:absolute;top:12px;right:16px;cursor:pointer;color:var(--silver);font-size:17px}
+
+  /* light-theme trajectory/warn tokens */
+  :root{--warn:#e8915f; --tr-bau:#7a716a; --tr-target:#e8915f; --tr-adj:#059669; --tr-grid:#f0ede6;}
+
+  /* ---- chips (TargetSet + shared) ---- */
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .chip{font:11px Inter,'Segoe UI',sans-serif;padding:5px 11px;border-radius:20px;background:var(--surface2);
+    border:1px solid var(--border);color:var(--muted)}
+  .chip.ok{background:color-mix(in srgb, var(--green) 14%, transparent);border-color:var(--green);color:var(--green);font-weight:600}
+  /* ---- view tabs ---- */
+  #view-tabs{display:flex;gap:4px;margin-left:10px}
+  .view-tab{background:transparent;border:1px solid transparent;color:var(--silver);font-family:Inter,'Segoe UI',sans-serif;
+    font-size:11px;padding:5px 11px;border-radius:9px;cursor:pointer;white-space:nowrap}
+  .view-tab:hover{border-color:var(--border);color:var(--cream)}
+  .view-tab.active{background:var(--gold);color:#fff;border-color:var(--gold);font-weight:600}
+  .view-tab.planned{opacity:.45;cursor:not-allowed}
+  .view-tab.planned:hover{border-color:transparent;color:var(--silver)}
+  @media (max-width:1500px){ .tb-btn{white-space:nowrap;font-size:9px;padding:5px 7px} }
+  @media (max-width:1400px){ #titlebar .brand span{display:none} }
+  @media (max-width:1350px){ .view-tab.planned{display:none} }
+  @media (max-width:1000px){ .view-tab{font-size:10px;padding:4px 8px} }
+  #app:not(.active), #app-inv:not(.active){display:none}
+  #app-inv{height:calc(100vh - 44px);display:flex;overflow:hidden}
+  /* ---- TargetSet view ---- */
+  #inv-left{width:300px;min-width:300px;height:100%;background:var(--pane);border-right:1px solid var(--border);
+    overflow-y:auto;padding:18px 16px 40px;display:flex;flex-direction:column;gap:14px}
+  #inv-main{flex:1;min-width:0;overflow-y:auto;padding:22px 26px 40px;display:flex;flex-direction:column;gap:16px}
+  .seg{display:flex;gap:4px;background:var(--panel-lit);padding:4px;border-radius:11px}
+  .seg button{flex:1;border:0;background:transparent;color:var(--muted);font:11.5px Inter,'Segoe UI',sans-serif;
+    padding:7px 8px;border-radius:8px;cursor:pointer}
+  .seg button.on{background:var(--pane);color:var(--accent);font-weight:600;box-shadow:0 1px 3px rgba(60,50,120,.10)}
+  .inv-baseline{background:var(--pane);border:1px solid var(--accent);border-radius:12px;padding:12px 14px}
+  .inv-baseline .big{font-size:24px;color:var(--accent);font-weight:700}
+  .inv-baseline .lbl{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:3px;font-family:Inter,sans-serif}
+  .inv-baseline .src{font-size:10px;color:var(--muted);margin-top:7px;line-height:1.45}
+  .inv-sec{display:flex;flex-direction:column;gap:9px}
+  .inv-row .lbl{display:flex;justify-content:space-between;gap:8px;font:11px Inter,sans-serif;color:var(--muted);margin-bottom:4px}
+  .inv-row .lbl span{flex:1;min-width:0}
+  .inv-row .lbl b{color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .inv-track{height:7px;background:var(--panel-lit);border-radius:5px;overflow:hidden}
+  .inv-fill{height:100%;background:var(--accent);border-radius:5px}
+  .inv-fill.alt{background:var(--green)}
+  .inv-card{background:var(--pane);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+  .inv-card h2{font-size:15px;font-weight:600;margin-bottom:10px}
+  .inv-chart{width:100%;height:auto;display:block}
+  .inv-chart .grid{stroke:var(--border);stroke-width:.7}
+  .inv-chart .axis{stroke:var(--border);stroke-width:1}
+  .inv-chart text{fill:var(--muted);font:9px Inter,sans-serif}
+  .inv-chart .meas{fill:none;stroke:var(--accent);stroke-width:2.5}
+  .inv-chart .measdot{fill:var(--accent)}
+  .inv-chart .trendline{fill:none;stroke:var(--tr-bau);stroke-width:1.5;stroke-dasharray:4 3}
+  .inv-chart .targline{fill:none;stroke:var(--tr-target);stroke-width:2;stroke-dasharray:6 4}
+  .inv-chart .targdot{fill:var(--tr-target)}
+  .inv-legend{display:flex;gap:12px;flex-wrap:wrap;font:11px Inter,sans-serif;color:var(--muted);margin-top:8px}
+  .inv-legend i{display:inline-block;width:16px;height:3px;border-radius:2px;margin-right:4px;vertical-align:middle}
+  .inv-targets{width:100%;border-collapse:collapse;font:12px Inter,sans-serif}
+  .inv-targets th{text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+    font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border)}
+  .inv-targets td{padding:7px 8px;border-bottom:1px solid var(--line-dim);color:var(--ink)}
+  .inv-targets td.num{font-variant-numeric:tabular-nums}
+  .inv-note{font-size:11px;color:var(--muted);border-left:3px solid var(--border);padding:6px 0 6px 10px;line-height:1.5}
+  .inv-note b{color:var(--ink)}
+  .inv-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  .inv-inputs label{font:10.5px Inter,sans-serif;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+  .inv-inputs input{background:var(--panel-lit);border:1px solid var(--border);border-radius:9px;color:var(--ink);
+    font:12px Inter,sans-serif;padding:6px 9px;outline:none}
+  .inv-inputs input:focus{border-color:var(--accent)}
+  @media (max-width:1100px){ #inv-left{width:264px;min-width:264px} }
+  @media (max-width:900px){ #inv-left{display:none} }
+  /* ---- Dark mode (Arc Night) ---- */
+  :root[data-theme="dark"]{
+    --bg:#14161e; --pane:#1b1e29; --panel-dark:#1b1e29; --panel-lit:#222635;
+    --ink:#eceaf3; --muted:#9aa2b4; --accent:#8b90ff; --accent2:#34d399; --green:#34d399;
+    --violet:#b3a3ff; --warn:#f0a878; --surface2:#222635; --border:#2e3342;
+    --line:rgba(139,144,255,.40); --line-dim:rgba(139,144,255,.14);
+    --tr-bau:#9aa2b4; --tr-target:#f0a878; --tr-adj:#34d399; --tr-grid:#232735;
+  }
+  :root[data-theme="dark"] .phase-header{background:rgba(27,30,41,.92)}
+  :root[data-theme="dark"] #zoom-ctl{background:rgba(27,30,41,.94)}
+  :root[data-theme="dark"] .lane{background:rgba(255,255,255,.02)}
+  :root[data-theme="dark"] .impact-result{background:rgba(52,211,153,.10)}
+  :root[data-theme="dark"] .impact-k{color:var(--muted)}
+  #trajectory path.trbau{stroke:var(--tr-bau);fill:none}
+  #trajectory path.trtarget{stroke:var(--tr-target);fill:none;stroke-width:1.2;stroke-dasharray:3 2}
+  #trajectory path.tradj{stroke:var(--tr-adj);fill:none}
+  #trajectory line.traxis{stroke:var(--border)}
+  #trajectory line.trgrid{stroke:var(--tr-grid);stroke-width:.5}
+  #trajectory text.trtext{fill:var(--muted)}
 </style>
 </head>
 <body>
 <div id="titlebar">
-  <div class="brand">PATHWAYS<span>local climate action programs, visualized</span></div>
+  <div class="brand">PATHWAYS<span>setting the path to climate action</span></div>
   <select id="pg-select"></select>
+  <div id="view-tabs">
+    <button class="view-tab active" data-view="pathfinder">PathFinder</button>
+    <button class="view-tab" data-view="targetset">TargetSet</button>
+    <button class="view-tab planned" data-view="climateready" title="Planned — vulnerability, mitigation, adaptation">ClimateReady</button>
+    <button class="view-tab planned" data-view="mobilization" title="Planned — milestones, reporting, grant export">Mobilization</button>
+    <button class="view-tab planned" data-view="collective" title="Planned — NYS portfolio view">Collective Action</button>
+  </div>
   <div class="right">
-    <button class="tb-btn" id="btn-export">⬇ Export progress</button>
+    <button class="tb-btn" id="theme-btn" title="Toggle dark mode">◐ Dark</button><button class="tb-btn" id="btn-export">⬇ Export progress</button>
     <button class="tb-btn" id="btn-import-pg">＋ Import program</button>
     <button class="tb-btn" id="btn-help">? How this works</button>
   </div>
 </div>
-<div id="app">
+<div id="app" class="active">
   <div id="left">
     <div>
       <h1 id="pg-title"></h1>
@@ -175,7 +281,7 @@
       <p class="impact-disclosure">Planning illustration only — not an emissions inventory or a DEC-approved accounting method.</p>
       <div id="trajectory" aria-label="Illustrative emissions trajectory: business as usual, with your actions, and target path.">
         <svg id="traj-svg" viewBox="0 0 248 130" role="img"></svg>
-        <div class="legend"><span><i style="background:#8a93a3"></i>Business as usual</span><span><i style="background:#9bdd8d"></i>With your actions</span><span><i style="background:#e8915f"></i>Target path</span></div>
+        <div class="legend"><span><i style="background:var(--tr-bau)"></i>Business as usual</span><span><i style="background:var(--tr-adj)"></i>With your actions</span><span><i style="background:var(--tr-target)"></i>Target path</span></div>
         <p id="traj-summary" style="margin-top:5px"></p>
         <details><summary>Scenario assumptions (editable)</summary>
           <div id="traj-inputs">
@@ -273,10 +379,55 @@
   <h2>Import a program module</h2>
   <p>Paste a program JSON (schema in <code>How this works</code>) or select a file:</p>
   <input type="file" id="import-file" accept=".json" style="color:var(--silver);font-family:Verdana;font-size:11px">
-  <textarea id="import-text" style="width:100%;height:160px;margin-top:10px;background:#10151d;color:#cfd6df;border:1px solid #2c333d;border-radius:6px;padding:10px;font-family:'Courier New',monospace;font-size:11px" placeholder="Paste program JSON here…"></textarea>
+  <textarea id="import-text" style="width:100%;height:160px;margin-top:10px;background:var(--panel-lit);color:var(--muted);border:1px solid var(--border);border-radius:10px;padding:10px;font-family:'Courier New',monospace;font-size:11px" placeholder="Paste program JSON here…"></textarea>
   <button class="done-btn" id="import-go" style="width:100%">Import program</button>
   <p id="import-msg" style="margin-top:8px"></p>
 </div></div>
+
+
+<div id="app-inv">
+  <div id="inv-left">
+    <div>
+      <h1 id="inv-title">Baseline &amp; Targets</h1>
+      <div class="sub" id="inv-sub"></div>
+    </div>
+    <div class="seg" id="inv-ledger-seg"></div>
+    <div id="inv-baseline"></div>
+    <div class="inv-sec">
+      <div class="sec-h" id="inv-sector-h">Emissions by sector</div>
+      <div id="inv-sectors"></div>
+    </div>
+    <div class="inv-sec">
+      <div class="sec-h">All inventory years</div>
+      <div id="inv-years"></div>
+    </div>
+  </div>
+  <div id="inv-main">
+    <div class="inv-card">
+      <div class="panel-h"><h2 id="inv-chart-h">Emissions over time</h2>
+        <span class="hint">measured · trend · target path — hover-free static view</span></div>
+      <div id="inv-chart"></div>
+      <div class="inv-legend">
+        <span><i style="background:var(--accent)"></i>Measured inventory</span>
+        <span><i style="background:var(--tr-bau)"></i>Trend (assumption)</span>
+        <span><i style="background:var(--tr-target)"></i>Target path</span>
+      </div>
+      <div class="chip-row" id="inv-chips"></div>
+    </div>
+    <div class="inv-card">
+      <h2>Targets</h2>
+      <div id="inv-targets"></div>
+    </div>
+    <div class="inv-card">
+      <h2>Assumptions (editable)</h2>
+      <div class="inv-inputs">
+        <label>Trend growth %/yr<input id="inv-growth" type="number" step="0.1" min="-10" max="10"></label>
+        <label>Projection end year<input id="inv-endyear" type="number" min="2026" max="2100" step="1"></label>
+      </div>
+      <p class="inv-note" id="inv-note" style="margin-top:12px"></p>
+    </div>
+  </div>
+</div>
 
 <script>
 const PROGRAMS = {};
@@ -2399,6 +2550,165 @@ const PathwaysGHG = (() => {
 })();
 if (typeof module !== 'undefined') module.exports = PathwaysGHG;
 /* GHG_MODEL_END */
+/* INVENTORY_MODEL_START */
+/* Pure inventory-ledger logic for the TargetSet view. No DOM access.
+   Rule: a government-operations ledger is a SUBSET of the community ledger —
+   ledgers are never summed. Targets are percent-below the ledger's own
+   baseline-year total. */
+const PathwaysInventory = (() => {
+  const round = (v, d = 1) => {
+    const f = 10 ** d;
+    return Math.round(v * f) / f;
+  };
+
+  function listLedgers(data) {
+    return (data && Array.isArray(data.ledgers)) ? data.ledgers : [];
+  }
+
+  function ledgerById(data, id) {
+    return listLedgers(data).find(l => l.id === id) || null;
+  }
+
+  function sortedRecords(ledger) {
+    const recs = (ledger && Array.isArray(ledger.records)) ? ledger.records.slice() : [];
+    return recs.filter(r => r && Number.isFinite(r.year) && Number.isFinite(r.total))
+               .sort((a, b) => a.year - b.year);
+  }
+
+  function baselineRecord(ledger) {
+    const recs = sortedRecords(ledger);
+    if (!recs.length) return null;
+    const want = ledger.baseline_year;
+    return recs.find(r => r.year === want) || recs[0];
+  }
+
+  function latestRecord(ledger) {
+    const recs = sortedRecords(ledger);
+    return recs.length ? recs[recs.length - 1] : null;
+  }
+
+  /* sector rows for a record: absolute values when given, else derived from
+     percentage shares (null-safe: unknown shares return []) */
+  function sectorRows(ledger, record) {
+    if (!record) return [];
+    if (record.sectors && typeof record.sectors === 'object') {
+      const total = Number.isFinite(record.total) ? record.total : Object.values(record.sectors).reduce((a, b) => a + b, 0);
+      return Object.entries(record.sectors).map(([name, value]) => ({
+        name, value: round(value), pct: total ? round(value / total * 100) : null,
+      })).sort((a, b) => b.value - a.value);
+    }
+    if (record.sector_shares && typeof record.sector_shares === 'object') {
+      const total = Number.isFinite(record.total) ? record.total : null;
+      return Object.entries(record.sector_shares)
+        .filter(([, pct]) => Number.isFinite(pct))
+        .map(([name, pct]) => ({ name, value: total ? round(total * pct / 100) : null, pct: round(pct) }))
+        .sort((a, b) => b.pct - a.pct);
+    }
+    return [];
+  }
+
+  function targetsFor(data, ledgerId) {
+    return ((data && data.targets) || []).filter(t => t && t.ledger === ledgerId);
+  }
+
+  function trendValue(baselineTotal, baselineYear, year, growthPctYr) {
+    const g = Number.isFinite(growthPctYr) ? growthPctYr / 100 : 0;
+    return round(baselineTotal * Math.pow(1 + g, year - baselineYear));
+  }
+
+  /* target path: starts at the baseline total (baseline year) and steps
+     linearly between declared target years; held flat after the last target
+     year; never below zero. */
+  function targetValueAt(baselineTotal, baselineYear, stops, year) {
+    const pts = [{ year: baselineYear, value: baselineTotal }].concat(
+      (stops || []).filter(s => Number.isFinite(s.year) && Number.isFinite(s.pct))
+        .map(s => ({ year: s.year, value: baselineTotal * (1 - s.pct / 100) }))
+        .sort((a, b) => a.year - b.year)
+    );
+    if (!pts.length) return 0;
+    if (year <= pts[0].year) return round(Math.max(0, pts[0].value));
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i + 1];
+      if (year >= a.year && year <= b.year) {
+        const span = (b.year - a.year) || 1;
+        return round(Math.max(0, a.value + (b.value - a.value) * ((year - a.year) / span)));
+      }
+    }
+    return round(Math.max(0, pts[pts.length - 1].value));
+  }
+
+  /* years are the union of inventory years, target years, and the requested
+     window; measured is null except on real inventory years. */
+  function buildProjection(data, ledgerId, opts = {}) {
+    const ledger = ledgerById(data, ledgerId);
+    if (!ledger) return null;
+    const base = baselineRecord(ledger);
+    if (!base) return null;
+    const recs = sortedRecords(ledger);
+    const stops = (targetsFor(data, ledgerId)[0] || {}).stops || [];
+    const growth = Number.isFinite(opts.growthPctYr) ? opts.growthPctYr
+      : (ledger.trend_assumption && Number.isFinite(ledger.trend_assumption.growth_pct_yr)
+          ? ledger.trend_assumption.growth_pct_yr : 0);
+    const lastStopYear = stops.reduce((m, s) => Math.max(m, s.year || base.year), base.year);
+    const latestYear = recs.length ? recs[recs.length - 1].year : base.year;
+    const endYear = Number.isFinite(opts.endYear) ? opts.endYear
+      : Math.max(lastStopYear, latestYear, base.year + 5);
+    const startYear = Math.min(base.year, recs[0].year);
+    const rows = recs.reduce((m, r) => (m[r.year] = r.total, m), {});
+    const points = [];
+    for (let y = startYear; y <= endYear; y++) {
+      points.push({
+        year: y,
+        measured: Object.prototype.hasOwnProperty.call(rows, y) ? round(rows[y]) : null,
+        trend: trendValue(base.total, base.year, y, growth),
+        target: targetValueAt(base.total, base.year, stops, y),
+      });
+    }
+    const proj = {
+      ledgerId, ledgerName: ledger.name, units: ledger.units || 't CO2e',
+      scope: ledger.scope || 'community',
+      baselineYear: base.year, baselineTotal: round(base.total), baselineSource: base.source || null,
+      latestYear, latestTotal: round(rows[latestYear] != null ? rows[latestYear] : base.total),
+      growthPctYr: growth, endYear, stops,
+      points,
+      targetMetYear: null,
+    };
+    const measuredPts = points.filter(p => p.measured != null);
+    const lastMeasured = measuredPts[measuredPts.length - 1];
+    if (lastMeasured && lastMeasured.measured <= lastMeasured.target) {
+      // the baseline year sits on its own path by definition — never report it
+      const hit = measuredPts.find(p => p.year > base.year && p.measured <= p.target);
+      proj.targetMetYear = hit ? hit.year : null;
+    }
+    return proj;
+  }
+
+  /* percent above (+) or below (−) the target path at a measured year */
+  function gapPctAt(projection, year) {
+    if (!projection) return null;
+    const p = projection.points.find(pt => pt.year === year);
+    if (!p || p.measured == null || !p.target) return null;
+    return round((p.measured - p.target) / p.target * 100);
+  }
+
+  function summarize(ledger) {
+    const base = baselineRecord(ledger), latest = latestRecord(ledger);
+    if (!base || !latest) return null;
+    return {
+      baselineYear: base.year, baselineTotal: round(base.total), baselineSource: base.source || null,
+      latestYear: latest.year, latestTotal: round(latest.total),
+      changePct: round((latest.total - base.total) / base.total * 100),
+      sectors: sectorRows(ledger, latest),
+    };
+  }
+
+  return { listLedgers, ledgerById, sortedRecords, baselineRecord, latestRecord,
+           sectorRows, targetsFor, trendValue, targetValueAt, buildProjection,
+           gapPctAt, summarize, round };
+})();
+if (typeof module !== 'undefined') module.exports = PathwaysInventory;
+/* INVENTORY_MODEL_END */
+
 
 // Rounded concept defaults for CSC only. Each amount belongs to an action; CSC
 // points are used only to prorate that action's amount, never as a tons factor.
@@ -2524,7 +2834,7 @@ function refresh(chainIds, focusId){
       const x1=A.x+activeLayout.cardWidth,y1=A.y+44,x2=B.x,y2=B.y+44,mx=(x1+x2)/2;
       const done=state[p]&&state[a.id];
       const onChain=chainIds&&chainIds.has(a.id);
-      const col=onChain?'rgba(169,127,214,.95)':!state[p]?'rgba(120,125,135,.22)':(done?'rgba(201,169,89,.85)':'rgba(201,169,89,.45)');
+      const col=onChain?'rgba(169,127,214,.95)':!state[p]?'rgba(120,125,135,.22)':(done?'rgba(79,70,229,.85)':'rgba(79,70,229,.45)');
       h+=`<path d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}" fill="none" stroke="${col}" stroke-width="${onChain?3:done?2.5:1.5}"/>`;
     });
   });
@@ -2590,12 +2900,12 @@ function drawTrajectory(){
   const xYear=year=>pad.l+(year-years[0])/((years.at(-1)-years[0])||1)*(W-pad.l-pad.r);
   const yLine=v=>(H-pad.b)-(Math.max(0,v)/maxV)*(H-pad.t-pad.b);
   const path=key=>t.map((p,i)=>(i?'L':'M')+xYear(p.year).toFixed(1)+','+yLine(p[key]).toFixed(1)).join('');
-  let g=`<line x1="${pad.l}" y1="${H-pad.b}" x2="${W-pad.r}" y2="${H-pad.b}" stroke="#3a4048"/>`;
-  [0,.5,1].forEach(f=>{const yy=yLine(maxV*f);g+=`<line x1="${pad.l}" y1="${yy}" x2="${W-pad.r}" y2="${yy}" stroke="#232a34" stroke-width=".5"/><text x="${pad.l-3}" y="${yy+7}" font-size="6" fill="#6b7684" text-anchor="end" font-family="Verdana">${f===0?'0':(maxV*f/1000).toFixed(0)+'k'}</text>`});
-  [years[0],Math.round((years[0]+years.at(-1))/2),years.at(-1)].forEach(yr=>{g+=`<text x="${xYear(yr)}" y="${H-4}" font-size="6.5" fill="#6b7684" text-anchor="middle" font-family="Verdana">${yr}</text>`});
-  g+=`<path d="${path('bau')}" fill="none" stroke="#8a93a3" stroke-width="1.5"/>`;
-  g+=`<path d="${path('target')}" fill="none" stroke="#e8915f" stroke-width="1.2" stroke-dasharray="3 2"/>`;
-  g+=`<path d="${path('adjusted')}" fill="none" stroke="#9bdd8d" stroke-width="2"/>`;
+  let g=`<line x1="${pad.l}" y1="${H-pad.b}" x2="${W-pad.r}" y2="${H-pad.b}" class="traxis"/>`;
+  [0,.5,1].forEach(f=>{const yy=yLine(maxV*f);g+=`<line x1="${pad.l}" y1="${yy}" x2="${W-pad.r}" y2="${yy}" class="trgrid"/><text x="${pad.l-3}" y="${yy+7}" font-size="6" class="trtext" text-anchor="end" font-family="Verdana">${f===0?'0':(maxV*f/1000).toFixed(0)+'k'}</text>`});
+  [years[0],Math.round((years[0]+years.at(-1))/2),years.at(-1)].forEach(yr=>{g+=`<text x="${xYear(yr)}" y="${H-4}" font-size="6.5" class="trtext" text-anchor="middle" font-family="Verdana">${yr}</text>`});
+  g+=`<path d="${path('bau')}" fill="none" class="trbau"/>`;
+  g+=`<path d="${path('target')}" fill="none" class="trtarget"/>`;
+  g+=`<path d="${path('adjusted')}" fill="none" class="tradj"/>`;
   svgTraj.setAttribute('viewBox',`0 0 ${W} ${H}`);
   svgTraj.innerHTML=g;
   const last=t.at(-1), lastTarget=t.find(pt=>pt.year===(scenario.targetYear||2019))||last;
@@ -2636,7 +2946,7 @@ function hud(){
   const ms=[];
   (P.levels||[]).filter(l=>l.name!=='Registered').forEach(l=>{
     ms.push(`<div class="bar-row"><div class="lbl"><span>→ ${l.name} (${l.min_points} pts)</span><span>${Math.min(100,Math.round(pts/l.min_points*100))}%</span></div><div class="track"><div class="fill" style="width:${Math.min(100,pts/l.min_points*100)}%"></div></div></div>`);
-    ms.push(`<div class="bar-row" style="margin-bottom:7px"><div class="lbl"><span style="color:#6b7684">${l.name} needs ≥${l.min_categories} categories</span><span style="color:#6b7684">${cats.size}/${l.min_categories}</span></div><div class="track"><div class="fill pe" style="width:${Math.min(100,cats.size/l.min_categories*100)}%;background:#4a7f40"></div></div></div>`);
+    ms.push(`<div class="bar-row" style="margin-bottom:7px"><div class="lbl"><span style="color:var(--muted)">${l.name} needs ≥${l.min_categories} categories</span><span style="color:var(--muted)">${cats.size}/${l.min_categories}</span></div><div class="track"><div class="fill pe" style="width:${Math.min(100,cats.size/l.min_categories*100)}%;background:var(--green)"></div></div></div>`);
   });
   document.getElementById('milestones').innerHTML=ms.join('');
   const pl=[];
@@ -2721,7 +3031,7 @@ function openPanel(id){
   } else a.details.forEach(d=>{
     body+=`<section><h5>${(a.details.length>1)?esc(d.title||'Component'):'Overview'}</h5>`+
       `<p>${esc(d.why||d.how||'')}</p>`+
-      (d.timeframe?`<p style="margin-top:8px;color:#9fb0c3"><b>Time &amp; cost:</b> ${esc(d.timeframe)}</p>`:'')+`</section>`;
+      (d.timeframe?`<p style="margin-top:8px;color:var(--muted)"><b>Time &amp; cost:</b> ${esc(d.timeframe)}</p>`:'')+`</section>`;
     body+=section('How the points are calculated',d.points_how?`<p>${esc(d.points_how)}</p>`:'');
     body+=section('What you need to submit',d.submit?`<p>${esc(d.submit)}</p>`:'');
     if(d.recert) body+=section('Recertification',`<p>${esc(d.recert)}</p>`);
@@ -2881,6 +3191,213 @@ sel.innerHTML=`<option data-builtin>BUILTIN</option>`; // temporary
   fillSelect();bindScenarioInputs();
   const cur = localStorage.getItem('pathways-current');
   loadProgram(all[cur] ? cur : BUILTIN.id);
+})();
+</script>
+<script>/* ---- TargetSet: demo inventory data (Sleepy Hollow CAP figures) ---- */
+const INVENTORY_DEMO = {
+  id: 'demo-sleepy-hollow',
+  name: 'Sleepy Hollow, NY',
+  label: 'Demo — Sleepy Hollow CAP figures (illustrative, not live data)',
+  ledgers: [
+    { id: 'community', name: 'Community-wide', units: 'MtCO2e', scope: 'community',
+      sectors: ['transportation', 'residential', 'commercial', 'waste'],
+      baseline_year: 2019,
+      records: [
+        { year: 2019, total: 74615, source: 'Village of Sleepy Hollow CAP 2025 (2019 inventory)' },
+        { year: 2023, total: 87000, sector_shares: { 'Transportation': 49, 'Buildings & energy use': 48, 'Other (waste, water, minor)': 3 },
+          source: 'Sleepy Hollow 2023 GHG inventories (CAP §2)' }
+      ],
+      trend_assumption: { growth_pct_yr: 2.0, source_label: 'placeholder — editable' } },
+    { id: 'govops', name: 'Government operations', units: 'MtCO2e', scope: 'govops',
+      sectors: ['vehicle_fleet', 'buildings', 'public_lighting', 'water_wastewater'],
+      baseline_year: 2018,
+      records: [
+        { year: 2018, total: 1078,
+          sectors: { 'Vehicle Fleet': 428, 'Buildings & Facilities': 344, 'Public Lighting': 179, 'Water & Wastewater Distribution': 127 },
+          source: 'Sleepy Hollow Government Operations GHG Inventory (CAP Fig 2-1, 2018 data)' }
+      ],
+      trend_assumption: { growth_pct_yr: 0.5, source_label: 'placeholder — editable' } }
+  ],
+  targets: [
+    { id: 'clcpa', name: 'CLCPA-aligned (40 / 85)', ledger: 'community',
+      stops: [ { pct: 40, year: 2030 }, { pct: 85, year: 2050 } ],
+      source: 'Sleepy Hollow CAP — aligns NY CLCPA and Westchester County goals' },
+    { id: 'govops-fleet', name: '50% municipal fleet zero-emission (2030)', ledger: 'govops',
+      stops: [], note: 'Non-tonnage goal from the CAP (fleet transition), tracked in Mobilization.',
+      source: 'Sleepy Hollow CAP — government operations goals' }
+  ]
+};
+
+function invState() {
+  if (!window.__invState) {
+    window.__invState = { ledger: 'community', growth: null, endYear: null, data: INVENTORY_DEMO };
+  }
+  return window.__invState;
+}
+
+function invLedgerSeg(){
+  const st = invState();
+  const seg = document.getElementById('inv-ledger-seg');
+  seg.innerHTML = PathwaysInventory.listLedgers(st.data).map(l =>
+    `<button data-ledger="${l.id}" class="${l.id === st.ledger ? 'on' : ''}">${l.name}</button>`).join('');
+  seg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    st.ledger = b.dataset.ledger;
+    st.growth = null; st.endYear = null;
+    renderInventory();
+  }));
+}
+
+function invChart(proj) {
+  const W = 760, H = 330, pad = { l: 54, r: 16, t: 16, b: 34 };
+  const pts = proj.points;
+  const y0 = pts[0].year, y1 = pts[pts.length - 1].year;
+  const maxV = Math.max(...pts.map(p => Math.max(p.trend, p.target, p.measured || 0))) * 1.05;
+  const x = y => pad.l + (y - y0) / ((y1 - y0) || 1) * (W - pad.l - pad.r);
+  const yy = v => (H - pad.b) - (Math.max(0, v) / maxV) * (H - pad.t - pad.b);
+  const path = (key, onlyMeasured) => {
+    const rows = pts.filter(p => onlyMeasured ? p[key] != null : true);
+    return rows.map((p, i) => `${i ? 'L' : 'M'}${x(p.year).toFixed(1)},${yy(p[key]).toFixed(1)}`).join('');
+  };
+  let g = '';
+  // tick labels must not collapse to "1k/1k/1k" on small ledgers (e.g. 1,078 t gov-ops)
+  const fmtTick = v => v >= 100000 ? Math.round(v / 1000) + 'k'
+    : v >= 10000 ? (Math.round(v / 100) / 10) + 'k'
+    : Math.round(v).toLocaleString();
+  for (let f = 0; f <= 1.0001; f += 0.25) {
+    const v = maxV * f, y = yy(v);
+    g += `<line class="grid" x1="${pad.l}" y1="${y.toFixed(1)}" x2="${W - pad.r}" y2="${y.toFixed(1)}"/>`
+      + `<text x="${pad.l - 7}" y="${(y + 3.5).toFixed(1)}" text-anchor="end">${fmtTick(v)}</text>`;
+  }
+  g += `<line class="axis" x1="${pad.l}" y1="${H - pad.b}" x2="${W - pad.r}" y2="${H - pad.b}"/>`;
+  const tickYears = [y0].concat(proj.stops.map(s => s.year)).concat([y1]).filter((v, i, a) => a.indexOf(v) === i).sort((a, b) => a - b);
+  tickYears.forEach(y => { g += `<text x="${x(y).toFixed(1)}" y="${H - pad.b + 15}" text-anchor="middle">${y}</text>`; });
+  g += `<path class="trendline" d="${path('trend')}"/>`;
+  g += `<path class="targline" d="${path('target')}"/>`;
+  g += `<path class="meas" d="${path('measured', true)}"/>`;
+  pts.filter(p => p.measured != null).forEach(p => {
+    g += `<circle class="measdot" cx="${x(p.year).toFixed(1)}" cy="${yy(p.measured).toFixed(1)}" r="4"/>`
+      + `<text x="${x(p.year).toFixed(1)}" y="${(yy(p.measured) - 10).toFixed(1)}" text-anchor="middle">${Math.round(p.measured / 1000)}k</text>`;
+  });
+  proj.stops.forEach(s => {
+    const v = PathwaysInventory.targetValueAt(proj.baselineTotal, proj.baselineYear, proj.stops, s.year);
+    g += `<circle class="targdot" cx="${x(s.year).toFixed(1)}" cy="${yy(v).toFixed(1)}" r="3.5"/>`;
+  });
+  return `<svg class="inv-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Emissions over time with trend and target path">${g}</svg>`;
+}
+
+function renderInventory() {
+  const st = invState();
+  const data = st.data;
+  const ledger = PathwaysInventory.ledgerById(data, st.ledger);
+  if (!ledger) return;
+  const sum = PathwaysInventory.summarize(ledger);
+  const firstTarget = PathwaysInventory.targetsFor(data, st.ledger).find(t => (t.stops || []).length);
+  const proj = PathwaysInventory.buildProjection(data, st.ledger, {
+    growthPctYr: st.growth == null ? undefined : st.growth,
+    endYear: st.endYear == null ? undefined : st.endYear,
+  });
+  if (!proj) return;
+  if (st.growth == null) st.growth = proj.growthPctYr;
+  if (st.endYear == null) st.endYear = proj.endYear;
+
+  document.getElementById('inv-sub').textContent = 'Inventory ledger · ' + data.name + ' · ' + data.label;
+  invLedgerSeg();
+
+  document.getElementById('inv-baseline').innerHTML =
+    `<div class="inv-baseline">
+       <div class="big">${sum.baselineTotal.toLocaleString()}</div>
+       <div class="lbl">${proj.units} · baseline year ${sum.baselineYear}</div>
+       <div class="lbl" style="margin-top:6px">Latest: ${sum.latestTotal.toLocaleString()} (${sum.latestYear}) · ${sum.changePct > 0 ? '+' : ''}${sum.changePct}%</div>
+       <div class="src"><b>Source:</b> ${sum.baselineSource || '—'}</div>
+     </div>`;
+
+  const sectorH = document.getElementById('inv-sector-h');
+  const rows = PathwaysInventory.sectorRows(ledger, PathwaysInventory.latestRecord(ledger));
+  sectorH.textContent = rows.length ? `Emissions by sector · ${sum.latestYear}` : 'Emissions by sector';
+  document.getElementById('inv-sectors').innerHTML = rows.length ? rows.map((r, i) => {
+    const pct = r.pct == null ? null : r.pct;
+    return `<div class="inv-row"><div class="lbl"><span>${r.name}</span><b>${r.value != null ? r.value.toLocaleString() : '—'}${pct != null ? ` · ${pct}%` : ''}</b></div>
+      <div class="inv-track"><div class="inv-fill${i % 2 ? ' alt' : ''}" style="width:${Math.max(2, pct || 0)}%"></div></div></div>`;
+  }).join('') : `<p class="inv-note">Sector split not extracted for this ledger/year yet — pending inventory ingestion.</p>`;
+
+  document.getElementById('inv-years').innerHTML = PathwaysInventory.sortedRecords(ledger).map(r =>
+    `<div class="metric"><span class="k">${r.year}</span><span class="v">${r.total.toLocaleString()}</span></div>`).join('');
+
+  document.getElementById('inv-chart').innerHTML = invChart(proj);
+  document.getElementById('inv-chart-h').textContent = `Emissions over time — ${proj.ledgerName}`;
+  const gap = PathwaysInventory.gapPctAt(proj, proj.latestYear);
+  const chips = [];
+  if (proj.stops.length) {
+    proj.stops.forEach(s => {
+      const v = PathwaysInventory.targetValueAt(proj.baselineTotal, proj.baselineYear, proj.stops, s.year);
+      chips.push(`<span class="chip">${s.year} target: −${s.pct}% → ${Math.round(v).toLocaleString()} ${proj.units}</span>`);
+    });
+  }
+  chips.push(gap == null ? `<span class="chip">Gap to target: no measured year</span>`
+    : `<span class="chip ${gap <= 0 ? 'ok' : ''}">${proj.latestYear} vs target: ${gap > 0 ? '+' : ''}${gap}%</span>`);
+  chips.push(`<span class="chip">${proj.scope === 'govops' ? 'subset of community total — never added' : 'community-wide total'}</span>`);
+  if (proj.targetMetYear) chips.push(`<span class="chip ok">on/below target path in ${proj.targetMetYear}</span>`);
+  document.getElementById('inv-chips').innerHTML = chips.join('');
+
+  const allTargets = PathwaysInventory.targetsFor(data, st.ledger);
+  document.getElementById('inv-targets').innerHTML = allTargets.length ? `
+    <table class="inv-targets"><thead><tr><th>Target</th><th>Stop</th><th>Implied ${proj.units}</th><th>Source</th></tr></thead><tbody>
+    ${allTargets.map(t => {
+      const stops = t.stops || [];
+      if (!stops.length) return `<tr><td>${t.name}</td><td>—</td><td>—</td><td>${t.source || '—'}${t.note ? ' · ' + t.note : ''}</td></tr>`;
+      return stops.map(s => {
+        const v = PathwaysInventory.targetValueAt(proj.baselineTotal, proj.baselineYear, stops, s.year);
+        return `<tr><td>${t.name}</td><td>−${s.pct}% by ${s.year}</td><td class="num">${Math.round(v).toLocaleString()}</td><td>${t.source || '—'}</td></tr>`;
+      }).join('');
+    }).join('')}
+    </tbody></table>` : `<p class="inv-note">No tonnage target declared for this ledger.</p>`;
+
+  const gIn = document.getElementById('inv-growth'), yIn = document.getElementById('inv-endyear');
+  gIn.value = proj.growthPctYr; yIn.value = proj.endYear;
+  gIn.oninput = () => { st.growth = Number(gIn.value); renderInventory(); };
+  yIn.oninput = () => { st.endYear = Number(yIn.value); renderInventory(); };
+
+  document.getElementById('inv-note').innerHTML =
+    `<b>Ledger rules:</b> ${proj.scope === 'govops'
+      ? 'government-operations emissions are a subset of the community total — shown separately, never summed.'
+      : 'community-wide emissions include government operations; totals are not additive across ledgers.'}
+     Targets are percent-below this ledger's baseline-year total (${sum.baselineYear}: ${sum.baselineTotal.toLocaleString()} ${proj.units}).
+     Trend growth (${proj.growthPctYr}%/yr) is a placeholder assumption, editable above. Certification points stay in PathFinder — inventory accounting is separate.` +
+    (firstTarget ? ` Target source: ${firstTarget.source}.` : '');
+}
+
+function setView(view) {
+  const pf = document.getElementById('app'), inv = document.getElementById('app-inv');
+  const isInv = view === 'targetset';
+  pf.classList.toggle('active', !isInv);
+  inv.classList.toggle('active', isInv);
+  document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
+  if (isInv) renderInventory();
+  try { localStorage.setItem('pw-view', view); } catch (e) {}
+}
+document.querySelectorAll('.view-tab').forEach(t => t.addEventListener('click', () => {
+  if (t.classList.contains('planned')) return;
+  setView(t.dataset.view);
+}));
+</script>
+<script>
+(function(){
+  var KEY='pw-theme', b=document.getElementById('theme-btn');
+  var want=localStorage.getItem(KEY);try{var q=new URL(location.href).searchParams.get('theme');if(q==='dark'||q==='light')want=q;}catch(e){}
+  if(want!=='dark'&&want!=='light') { try { want=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; } catch(e){ want='light'; } }
+  document.documentElement.setAttribute('data-theme',want);
+  if(b){ var paint=function(){ b.textContent=want==='dark'?'☀ Light':'◐ Dark'; };
+    paint();
+    b.addEventListener('click',function(){ want=(document.documentElement.getAttribute('data-theme')==='dark')?'light':'dark';
+      document.documentElement.setAttribute('data-theme',want); localStorage.setItem(KEY,want); paint(); }); }
+})();</script>
+<script>
+(function(){
+  var v=null; try{ v=localStorage.getItem('pw-view'); }catch(e){}
+  var q=null, led=null;
+  try{ var u=new URL(location.href); q=u.searchParams.get('view'); led=u.searchParams.get('ledger'); }catch(e){}
+  if(led && (led==='community'||led==='govops')) invState().ledger=led;
+  setView(q || v || 'pathfinder');
 })();
 </script>
 </body>

@@ -1,0 +1,98 @@
+{
+  "id": "demo-sleepy-hollow",
+  "name": "Sleepy Hollow, NY",
+  "label": "Demo — Sleepy Hollow CAP figures (illustrative, not live data)",
+  "ledgers": [
+    {
+      "id": "community",
+      "name": "Community-wide",
+      "units": "MtCO2e",
+      "scope": "community",
+      "sectors": [
+        "transportation",
+        "residential",
+        "commercial",
+        "waste"
+      ],
+      "baseline_year": 2019,
+      "records": [
+        {
+          "year": 2019,
+          "total": 74615,
+          "source": "Village of Sleepy Hollow CAP 2025 (2019 inventory)"
+        },
+        {
+          "year": 2023,
+          "total": 87000,
+          "sector_shares": {
+            "Transportation": 49,
+            "Buildings & energy use": 48,
+            "Other (waste, water, minor)": 3
+          },
+          "source": "Sleepy Hollow 2023 GHG inventories (CAP §2)"
+        }
+      ],
+      "trend_assumption": {
+        "growth_pct_yr": 2,
+        "source_label": "placeholder — editable"
+      }
+    },
+    {
+      "id": "govops",
+      "name": "Government operations",
+      "units": "MtCO2e",
+      "scope": "govops",
+      "sectors": [
+        "vehicle_fleet",
+        "buildings",
+        "public_lighting",
+        "water_wastewater"
+      ],
+      "baseline_year": 2018,
+      "records": [
+        {
+          "year": 2018,
+          "total": 1078,
+          "sectors": {
+            "Vehicle Fleet": 428,
+            "Buildings & Facilities": 344,
+            "Public Lighting": 179,
+            "Water & Wastewater Distribution": 127
+          },
+          "source": "Sleepy Hollow Government Operations GHG Inventory (CAP Fig 2-1, 2018 data)"
+        }
+      ],
+      "trend_assumption": {
+        "growth_pct_yr": 0.5,
+        "source_label": "placeholder — editable"
+      }
+    }
+  ],
+  "targets": [
+    {
+      "id": "clcpa",
+      "name": "CLCPA-aligned (40 / 85)",
+      "ledger": "community",
+      "stops": [
+        {
+          "pct": 40,
+          "year": 2030
+        },
+        {
+          "pct": 85,
+          "year": 2050
+        }
+      ],
+      "source": "Sleepy Hollow CAP — aligns NY CLCPA and Westchester County goals"
+    },
+    {
+      "id": "govops-fleet",
+      "name": "50% municipal fleet zero-emission (2030)",
+      "ledger": "govops",
+      "stops": [],
+      "note": "Non-tonnage goal from the CAP (fleet transition), tracked in Mobilization.",
+      "source": "Sleepy Hollow CAP — government operations goals"
+    }
+  ],
+  "_note": "Filler/demo inventory ledger for the TargetSet view. Figures from the Village of Sleepy Hollow Climate Action Plan (2025) with its 2018 government-operations, 2019 and 2023 community inventories. Illustrative — not live data."
+}
